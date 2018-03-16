@@ -11,6 +11,15 @@ class PlayerExtensionTableSeeder extends Seeder
      */
     public function run()
     {
-        //
+        DB::table('player_extension')->insert([
+	        [
+	        	'player_id' => 1,
+	        	'deck_id' => 1,
+	        ],
+	        [
+	        	'player_id' => 2,
+	        	'deck_id' => 1,
+	        ], 
+        ]);
     }
 }

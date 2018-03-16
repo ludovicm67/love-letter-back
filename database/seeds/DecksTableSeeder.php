@@ -11,6 +11,8 @@ class DecksTableSeeder extends Seeder
      */
     public function run()
     {
-        //
+        DB::table('decks')->insert([
+	        	'deck_name' => 'Original',
+        ]);
     }
 }

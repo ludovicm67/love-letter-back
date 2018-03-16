@@ -11,6 +11,15 @@ class OptionsTableSeeder extends Seeder
      */
     public function run()
     {
-        //
+        DB::table('options')->insert([
+	        [
+	        	'player_id' => 1,
+	        	'interface_color' => 'blue',
+	        ],
+	        [
+	        	'player_id' => 2,
+	        	'interface_color' => 'pink',
+	        ], 
+        ]);
     }
 }
