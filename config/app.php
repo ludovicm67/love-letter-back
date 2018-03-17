@@ -137,6 +137,7 @@ return [
     */
 
     'providers' => [
+        Tymon\JWTAuth\Providers\JWTAuthServiceProvider::class,
 
         /*
          * Laravel Framework Service Providers...
@@ -191,6 +192,7 @@ return [
     */
 
     'aliases' => [
+        'JWTAuth' => Tymon\JWTAuth\Facades\JWTAuth::class,
 
         'App' => Illuminate\Support\Facades\App::class,
         'Artisan' => Illuminate\Support\Facades\Artisan::class,
