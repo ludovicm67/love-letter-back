@@ -1,6 +1,6 @@
 <?php
 
-use Illuminate\Http\Request;
+// use Illuminate\Http\Request;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,6 +13,20 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
+// Route::middleware('auth:api')->get('/user', function (Request $request) {
+//     return $request->user();
+// });
+
+
+// all routes accessible by everybody
+Route::post('register', 'AuthController@register');
+Route::post('login', 'AuthController@login');
+// Route::post('recover', 'AuthController@recover');
+
+// all routes where we need to be signed in
+Route::group(['middleware' => ['jwt.auth']], function() {
+    Route::get('logout', 'AuthController@logout');
+    Route::get('test', function() {
+        return response()->json(['hello' => 'world']);
+    });
 });
