@@ -48,9 +48,28 @@ class AuthController extends Controller
           'password' => bcrypt($password)
         ]);
 
+        try {
+            // attempt to verify the credentials and create a token for the user
+            if (! $token = JWTAuth::attempt($credentials)) {
+                return response()->json([
+                  'success' => false,
+                  'error' => 'Unable to log you after registration. Maybe something was broken during your registration process. Please try again.'
+                ], 401);
+            }
+        } catch (JWTException $e) {
+            // something went wrong whilst attempting to encode the token
+            return response()->json([
+              'success' => false,
+              'error' => 'Account created successfully, but failed to login, please try again.'
+            ], 500);
+        }
+
         return response()->json([
-          'success'=> true,
-          'message'=> 'Thanks for signing up! You can now login.'
+          'success' => true,
+          'message' => 'Thanks for signing up! You can now login.',
+          'data' => [
+            'token' => $token
+          ]
         ]);
     }
 
