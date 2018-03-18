@@ -48,6 +48,28 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Exception $exception)
     {
+        if ($this->isHttpException($exception)) {
+            $statusCode = $exception->getStatusCode();
+            if ($statusCode == 404 || $statusCode == 405) {
+              $statusMsg = $exception->getMessage();
+              if (empty($statusMsg)) {
+                switch ($statusCode) {
+                  case 404:
+                    $statusMsg = "page not found";
+                    break;
+                  case 405:
+                    $statusMsg = "method not allowed";
+                    break;
+                  default:
+                    // do nothing
+                }
+              }
+              return response()->json([
+                  'success' => false,
+                  'message' => $statusMsg
+              ], $statusCode);
+            }
+        }
         return parent::render($request, $exception);
     }
 }
