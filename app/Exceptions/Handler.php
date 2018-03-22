@@ -50,10 +50,13 @@ class Handler extends ExceptionHandler
     {
         if ($this->isHttpException($exception)) {
             $statusCode = $exception->getStatusCode();
-            if ($statusCode == 404 || $statusCode == 405) {
+            if ($statusCode == 401 || $statusCode == 404 || $statusCode == 405) {
               $statusMsg = $exception->getMessage();
               if (empty($statusMsg)) {
                 switch ($statusCode) {
+                  case 401:
+                    $statusMsg = "unauthorized access (token may be invalidated)";
+                    break;
                   case 404:
                     $statusMsg = "page not found";
                     break;
