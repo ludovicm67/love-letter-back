@@ -29,4 +29,6 @@ Route::group(['middleware' => ['jwt.auth']], function() {
     Route::get('test', function() {
         return response()->json(['hello' => 'world']);
     });
+
+    Route::get('game/create', 'GameController@create');
 });
