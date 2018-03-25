@@ -47,7 +47,7 @@ class AuthController extends Controller
 
         try {
             // attempt to verify the credentials and create a token for the user
-            if (! $token = JWTAuth::attempt($credentials)) {
+            if (!$token = JWTAuth::attempt($credentials)) {
                 return response()->json([
                   'success' => false,
                   'error' => 'Unable to log you after registration. Maybe something was broken during your registration process. Please try again.'

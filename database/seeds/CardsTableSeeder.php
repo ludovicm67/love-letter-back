@@ -13,16 +13,16 @@ class CardsTableSeeder extends Seeder
     {
         DB::table('cards')->insert([
             [
-	        	'card_name' => 'Soldier',
-	        	'effect' => 'Choose a player and a card name (except “Soldier”). If the player has this card, he is eliminated.',
-	        	'value' => 1,
-	        	'number_copies' => 5,
+              'card_name' => 'Soldier',
+              'effect' => 'Choose a player and a card name (except “Soldier”). If the player has this card, he is eliminated.',
+              'value' => 1,
+              'number_copies' => 5,
             ],
             [
-                'card_name' => 'Clown',
-                'effect' => 'Look at a player’s hand.',
-                'value' => 2,
-                'number_copies' => 2,
+              'card_name' => 'Clown',
+              'effect' => 'Look at a player’s hand.',
+              'value' => 2,
+              'number_copies' => 2,
             ],
             [
                 'card_name' => 'Knight',
