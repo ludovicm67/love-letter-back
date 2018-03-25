@@ -61,11 +61,18 @@ class AuthController extends Controller
             ], 500);
         }
 
+        $user = auth()->user();
+
         return response()->json([
           'success' => true,
           'message' => 'Thanks for signing up! You can now login.',
           'data' => [
-            'token' => $token
+            'token' => $token,
+            'user_id' => $user->id,
+            'name' => $user->name,
+            'points' => $user->points,
+            'won_games' => $user->won_games,
+            'lost_games' => $user->lost_games
           ]
         ]);
     }
@@ -98,8 +105,21 @@ class AuthController extends Controller
             // something went wrong whilst attempting to encode the token
             return response()->json(['success' => false, 'error' => 'Failed to login, please try again.'], 500);
         }
+
+        $user = auth()->user();
+
         // all good so return the token
-        return response()->json(['success' => true, 'data'=> [ 'token' => $token ]]);
+        return response()->json([
+          'success' => true,
+          'data' => [
+            'token' => $token,
+            'user_id' => $user->id,
+            'name' => $user->name,
+            'points' => $user->points,
+            'won_games' => $user->won_games,
+            'lost_games' => $user->lost_games
+          ]
+        ]);
     }
 
     /**
