@@ -17,6 +17,7 @@ class CreatePlayersTable extends Migration
             $table->increments('player_id');
             $table->string('game_name', 20);
             $table->string('password', 100);
+            $table->integer('points');
             $table->integer('won_games');
             $table->integer('lost_games');
         });
