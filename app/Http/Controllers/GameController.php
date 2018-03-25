@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use Ramsey\Uuid\Uuid;
+use App\Events\TestEvent;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redis;
+use Ramsey\Uuid\Uuid;
 
 class GameController extends Controller
 {
@@ -13,6 +14,14 @@ class GameController extends Controller
         // @TODO: move this inside a test
         Redis::set('test', 'redis is working, yay!');
         dd(Redis::get('test'));
+    }
+
+    public function event() {
+      $event = new TestEvent([
+        'hello' => 'world'
+      ]);
+      event($event);
+      dd("ok");
     }
 
     public function create() {
