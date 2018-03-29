@@ -11,9 +11,9 @@ php:
 services:
   - docker
   - mysql
+  - redis-server
 
 before_script:
-  - docker run --name redis-server -d -p 6379:6379 redis
   - mysql -e 'CREATE DATABASE love_letter;'
   - cp .env.travis .env
   - composer self-update
