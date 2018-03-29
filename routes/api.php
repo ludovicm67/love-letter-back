@@ -13,4 +13,7 @@ Route::group(['middleware' => ['jwt.auth']], function() {
     Route::get('game/waitlist', 'GameController@waitlist');
     Route::post('game/join', 'GameController@join');
     Route::post('game/play', 'GameController@play');
+
+    // @TODO: delete this when finished
+    Route::get('deleteallgames', 'GameController@deleteAllGames');
 });

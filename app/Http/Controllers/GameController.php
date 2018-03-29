@@ -26,38 +26,84 @@ class GameController extends Controller
     }
 
     public function create() {
+      $gameId = Uuid::uuid4();
+
+      $gameInfos = [
+        'id' => $gameId,
+        'creator' => auth()->user()->id
+      ];
+
+      Redis::set('game:waiting:' . $gameId, json_encode($gameInfos));
+
       return response()->json([
         'success' => true,
         'data' => [
-          'game_id' => Uuid::uuid4()
+          'game_id' => $gameId,
+          'game_infos' => $gameInfos
+        ]
+      ]);
+    }
+
+    public function start(Request $request) {
+      $params = $request->only('game_id');
+      $rules = [
+          'game_id' => 'required|string|max:255'
+      ];
+
+      $validator = Validator::make($params, $rules);
+      if ($validator->fails()) {
+        return response()->json([
+          'success' => false,
+          'error' => $validator->messages()
+        ]);
+      }
+
+      $waitingKey = 'game:waiting:' . $params->game_id;
+      $startedKey = 'game:started:' . $params->game_id;
+      if (!Redis::exists($waitingKey)) {
+        if (Redis::exists($startedKey)) {
+          return response()->json([
+            'success' => false,
+            'message' => 'game already started'
+          ]);
+        } else {
+          return response()->json([
+            'success' => false,
+            'message' => 'game not found'
+          ]);
+        }
+      }
+
+      // start the game by renaming the key
+      Redis::rename($waitingKey, $startedKey);
+
+      $gameInfos = json_decode(Redis::get($startedKey));
+
+      return response()->json([
+        'success' => true,
+        'data' => [
+          'game_id' => $params->game_id,
+          'game_infos' => $gameInfos
         ]
       ]);
     }
 
     public function list() {
-      $uuid1 = Uuid::uuid4();
-      $uuid2 = Uuid::uuid4();
-      $uuid3 = Uuid::uuid4();
+      $games = Redis::keys('game:*');
       return response()->json([
         'success' => true,
         'data' => [
-          "$uuid1" => 'ok',
-          "$uuid2" => 'ok',
-          "$uuid3" => 'ok'
+          'games' => $games
         ]
       ]);
     }
 
     public function waitlist() {
-      $uuid1 = Uuid::uuid4();
-      $uuid2 = Uuid::uuid4();
-      $uuid3 = Uuid::uuid4();
+      $games = Redis::keys('game:waiting:*');
       return response()->json([
         'success' => true,
         'data' => [
-          "$uuid1" => 'ok',
-          "$uuid2" => 'ok',
-          "$uuid3" => 'ok'
+          'games' => $games
         ]
       ]);
     }
@@ -114,5 +160,18 @@ class GameController extends Controller
 
     private function playHuman($state, $params) {
       // @TODO
+    }
+
+
+
+    // @TODO: delete this when finished
+    public function deleteAllGames() {
+      $games = Redis::keys('game:*');
+      foreach ($games as $game) {
+        Redis::del($game);
+      }
+      return response()->json([
+        'success' => true
+      ]);
     }
 }
