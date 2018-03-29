@@ -81,4 +81,38 @@ class GameController extends Controller
         'data' => 'ok'
       ]);
     }
+
+    public function play(Request $request) {
+      $params = $request->only('game_id');
+      $rules = [
+          'game_id' => 'required|string|max:255'
+      ];
+      $validator = Validator::make($params, $rules);
+      if ($validator->fails()) {
+        return response()->json([
+          'success' => false,
+          'error' => $validator->messages()
+        ]);
+      }
+
+      // @TODO: fetch game state (+ check if game exists)
+      $state = [];
+
+      $this->playHuman($state, $params);
+      while (false) { // play while next player is an IA
+        $this->playIA($state, $params);
+      }
+
+      return response()->json([
+        'success' => true
+      ]);
+    }
+
+    private function playIA($state, $params) {
+      // @TODO
+    }
+
+    private function playHuman($state, $params) {
+      // @TODO
+    }
 }
