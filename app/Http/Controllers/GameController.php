@@ -40,7 +40,7 @@ class GameController extends Controller
     public function start(Request $request) {
       $params = $request->only('game_id');
       $rules = [
-          'game_id' => 'required|string|max:255'
+          'game_id' => 'required|string|min:36|max:36|regex:/^[0-9a-z-]+$/'
       ];
 
       $validator = Validator::make($params, $rules);
@@ -51,19 +51,19 @@ class GameController extends Controller
         ]);
       }
 
-      $waitingKey = 'game:waiting:' . $params->game_id;
-      $startedKey = 'game:started:' . $params->game_id;
+      $waitingKey = 'game:waiting:' . $params['game_id'];
+      $startedKey = 'game:started:' . $params['game_id'];
       if (!Redis::exists($waitingKey)) {
         if (Redis::exists($startedKey)) {
           return response()->json([
             'success' => false,
             'message' => 'game already started'
-          ]);
+          ], 409);
         } else {
           return response()->json([
             'success' => false,
             'message' => 'game not found'
-          ]);
+          ], 404);
         }
       }
 
@@ -75,7 +75,7 @@ class GameController extends Controller
       return response()->json([
         'success' => true,
         'data' => [
-          'game_id' => $params->game_id,
+          'game_id' => $params['game_id'],
           'game_infos' => $gameInfos
         ]
       ]);
@@ -105,7 +105,7 @@ class GameController extends Controller
 
       $params = $request->only('game_id');
       $rules = [
-          'game_id' => 'required|string|max:255'
+          'game_id' => 'required|string|min:36|max:36|regex:/^[0-9a-z-]+$/'
       ];
       $validator = Validator::make($params, $rules);
       if ($validator->fails()) {
@@ -114,6 +114,8 @@ class GameController extends Controller
           'error' => $validator->messages()
         ]);
       }
+
+      // @TODO: make player really join a game...
 
       return response()->json([
         'success' => true,
@@ -124,7 +126,7 @@ class GameController extends Controller
     public function play(Request $request) {
       $params = $request->only('game_id');
       $rules = [
-          'game_id' => 'required|string|max:255'
+          'game_id' => 'required|string|min:36|max:36|regex:/^[0-9a-z-]+$/'
       ];
       $validator = Validator::make($params, $rules);
       if ($validator->fails()) {
