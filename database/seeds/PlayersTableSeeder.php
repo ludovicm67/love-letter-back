@@ -25,6 +25,13 @@ class PlayersTableSeeder extends Seeder
         'points'     => 750,
         'won_games'  => 3,
         'lost_games' => 1,
+      ],
+      [
+        'name'       => 'root',
+        'password'   => bcrypt('root'),
+        'points'     => 4242,
+        'won_games'  => 42,
+        'lost_games' => 0,
       ]
     ]);
   }
