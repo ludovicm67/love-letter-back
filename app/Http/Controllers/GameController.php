@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use Validator;
+use App\Events\NewGameEvent;
 use App\Events\TestEvent;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redis;
 use Ramsey\Uuid\Uuid;
+use Validator;
 
 class GameController extends Controller
 {
@@ -18,6 +19,10 @@ class GameController extends Controller
       dd('ok');
     }
 
+    private function getWaitingGames() {
+      return Redis::keys('game:waiting:*');
+    }
+
     public function create() {
       $gameId = Uuid::uuid4();
 
@@ -27,6 +32,12 @@ class GameController extends Controller
       ];
 
       Redis::set('game:waiting:' . $gameId, json_encode($gameInfos));
+
+      $event = new NewGameEvent([
+        'game_id' => $gameId,
+        'games' => $this->getWaitingGames()
+      ]);
+      event($event);
 
       return response()->json([
         'success' => true,
@@ -92,7 +103,7 @@ class GameController extends Controller
     }
 
     public function waitlist() {
-      $games = Redis::keys('game:waiting:*');
+      $games = $this->getWaitingGames();
       return response()->json([
         'success' => true,
         'data' => [
