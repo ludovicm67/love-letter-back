@@ -20,8 +20,7 @@ class GameController extends Controller
     }
 
     private function getGameInfos($key) {
-      $gameInfos = json_decode(Redis::get($key));
-      return $gameInfos;
+      return json_decode(Redis::get($key));
     }
 
     private function getWaitingGames() {
@@ -30,10 +29,13 @@ class GameController extends Controller
 
     public function create() {
       $gameId = Uuid::uuid4();
-
+      $user = auth()->user();
       $gameInfos = [
         'id' => $gameId,
-        'creator' => auth()->user()->id,
+        'creator' => [
+          'id' => $user->id,
+          'name' => $user->name
+        ],
         'players' => [
           auth()->user()->id
         ]
@@ -89,7 +91,7 @@ class GameController extends Controller
       // start the game by renaming the key
       Redis::rename($waitingKey, $startedKey);
 
-      $gameInfos = json_decode(Redis::get($startedKey));
+      $gameInfos = $this->getGameInfos($startedKey);
 
       return response()->json([
         'success' => true,
@@ -142,6 +144,64 @@ class GameController extends Controller
       ]);
     }
 
+
+    /**
+     * DELETING PART
+     **/
+    private function deleteGameWithPermissions($key) {
+      $user = auth()->user();
+      if (Redis::exists($key)) {
+        $gameInfos = $this->getGameInfos($key);
+        if (isset($gameInfos->creator->id) && $gameInfos->creator->id == $user->id) {
+          Redis::del($key);
+          return 200;
+        } else {
+          return 403;
+        }
+      }
+    }
+
+    public function delete(Request $request) {
+      $params = $request->only('game_id');
+      $rules = [
+          'game_id' => 'required|string|min:36|max:36|regex:/^[0-9a-z-]+$/'
+      ];
+      $validator = Validator::make($params, $rules);
+      if ($validator->fails()) {
+        return response()->json([
+          'success' => false,
+          'error' => $validator->messages()
+        ]);
+      }
+
+      // delete game by deleting redis keys that contains the game_id
+      if ($this->deleteGameWithPermissions('game:waiting:' . $params['game_id']) == 403
+      || $this->deleteGameWithPermissions('game:started:' . $params['game_id']) == 403) {
+        return response()->json([
+          'success' => false,
+          'error' => 'cannot delete game of someone else'
+        ], 403);
+      }
+
+      return response()->json([
+        'success' => true
+      ]);
+    }
+
+    public function deleteAllGames() {
+      $games = Redis::keys('game:*');
+      foreach ($games as $game) {
+        Redis::del($game);
+      }
+      return response()->json([
+        'success' => true
+      ]);
+    }
+
+
+    /**
+     * PLAYING PART
+     **/
     public function play(Request $request) {
       $params = $request->only('game_id');
       $rules = [
@@ -174,18 +234,5 @@ class GameController extends Controller
 
     private function playHuman($state, $params) {
       // @TODO
-    }
-
-
-
-    // @TODO: delete this when finished
-    public function deleteAllGames() {
-      $games = Redis::keys('game:*');
-      foreach ($games as $game) {
-        Redis::del($game);
-      }
-      return response()->json([
-        'success' => true
-      ]);
     }
 }
