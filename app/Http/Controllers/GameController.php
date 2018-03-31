@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\DeleteGameEvent;
 use App\Events\NewGameEvent;
 use App\Events\TestEvent;
 use Illuminate\Http\Request;
@@ -154,6 +155,10 @@ class GameController extends Controller
         $gameInfos = $this->getGameInfos($key);
         if (isset($gameInfos->creator->id) && $gameInfos->creator->id == $user->id) {
           Redis::del($key);
+          $event = new DeleteGameEvent([
+            'games' => $this->getWaitingGames()
+          ]);
+          event($event);
           return 200;
         } else {
           return 403;
@@ -193,6 +198,10 @@ class GameController extends Controller
       foreach ($games as $game) {
         Redis::del($game);
       }
+      $event = new DeleteGameEvent([
+        'games' => $this->getWaitingGames()
+      ]);
+      event($event);
       return response()->json([
         'success' => true
       ]);
