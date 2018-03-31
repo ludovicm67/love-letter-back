@@ -19,8 +19,13 @@ class GameController extends Controller
       dd('ok');
     }
 
+    private function getGameInfos($key) {
+      $gameInfos = json_decode(Redis::get($key));
+      return $gameInfos;
+    }
+
     private function getWaitingGames() {
-      return Redis::keys('game:waiting:*');
+      return array_map([$this, 'getGameInfos'], Redis::keys('game:waiting:*'));
     }
 
     public function create() {
@@ -28,7 +33,10 @@ class GameController extends Controller
 
       $gameInfos = [
         'id' => $gameId,
-        'creator' => auth()->user()->id
+        'creator' => auth()->user()->id,
+        'players' => [
+          auth()->user()->id
+        ]
       ];
 
       Redis::set('game:waiting:' . $gameId, json_encode($gameInfos));
@@ -93,7 +101,7 @@ class GameController extends Controller
     }
 
     public function list() {
-      $games = Redis::keys('game:*');
+      $games = array_map([$this, 'getGameInfos'], Redis::keys('game:*'));
       return response()->json([
         'success' => true,
         'data' => [
