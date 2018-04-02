@@ -38,8 +38,14 @@ class GameController extends Controller
           'name' => $user->name
         ],
         'players' => [
-          auth()->user()->id
-        ]
+          [
+            'id' => auth()->user()->id,
+            'name' => auth()->user()->name,
+            'type' => 'human'
+          ]
+        ],
+        'finished' => false,
+        'playing' => 0 // index of players, to get the player which is playing
       ];
 
       Redis::set('game:waiting:' . $gameId, json_encode($gameInfos));
@@ -155,9 +161,15 @@ class GameController extends Controller
 
       $user = auth()->user();
       $game = $this->getGameInfos($waitingKey);
-      if (isset($game->players) && !in_array($user->id, $game->players)) {
-        $game->players[] = $user->id;
+      $me = [
+        'id' => auth()->user()->id,
+        'name' => auth()->user()->name,
+        'type' => 'human'
+      ];
+      if (isset($game->players) && !in_array($me, $game->players)) {
+        $game->players[] = $me;
       }
+      Redis::set($waitingKey, json_encode($game));
 
       return response()->json([
         'success' => true,
@@ -244,11 +256,39 @@ class GameController extends Controller
         ]);
       }
 
-      // @TODO: fetch game state (+ check if game exists)
-      $state = [];
+      $waitingKey = 'game:waiting:' . $params['game_id'];
+      $startedKey = 'game:started:' . $params['game_id'];
+      if (!Redis::exists($startedKey)) {
+        if (Redis::exists($waitingKey)) {
+          return response()->json([
+            'success' => false,
+            'message' => 'game not started'
+          ], 401);
+        } else {
+          return response()->json([
+            'success' => false,
+            'message' => 'game not found'
+          ], 404);
+        }
+      }
+
+      $user = auth()->user();
+      $state = $this->getGameInfos($startedKey);
 
       $this->playHuman($state, $params);
-      while (false) { // play while next player is an IA
+      $state = $this->getGameInfos($startedKey);
+
+      // this return is just for debug purposes (will block the rest of the code)
+      return response()->json([
+        'success' => true,
+        'data' => [
+          'game' => $state
+        ]
+      ]);
+
+      // play while next player is an IA
+      while (!$state->finished && $state->players[$state->playing]->type == 'IA') {
+        $state = $this->getGameInfos($startedKey);
         $this->playIA($state, $params);
       }
 
@@ -258,10 +298,12 @@ class GameController extends Controller
     }
 
     private function playIA($state, $params) {
-      // @TODO
+      // @TODO: edit the $state variable
+      Redis::set($state->id, json_encode($state));
     }
 
     private function playHuman($state, $params) {
-      // @TODO
+      // @TODO: edit the $state variable
+      Redis::set($state->id, json_encode($state));
     }
 }
