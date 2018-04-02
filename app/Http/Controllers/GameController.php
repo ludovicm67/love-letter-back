@@ -137,7 +137,27 @@ class GameController extends Controller
         ]);
       }
 
-      // @TODO: make player really join a game...
+      $waitingKey = 'game:waiting:' . $params['game_id'];
+      $startedKey = 'game:started:' . $params['game_id'];
+      if (!Redis::exists($waitingKey)) {
+        if (Redis::exists($startedKey)) {
+          return response()->json([
+            'success' => false,
+            'message' => 'game already started'
+          ], 401);
+        } else {
+          return response()->json([
+            'success' => false,
+            'message' => 'game not found'
+          ], 404);
+        }
+      }
+
+      $user = auth()->user();
+      $game = $this->getGameInfos($waitingKey);
+      if (isset($game->players) && !in_array($user->id, $game->players)) {
+        $game->players[] = $user->id;
+      }
 
       return response()->json([
         'success' => true,
