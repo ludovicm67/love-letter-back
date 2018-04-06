@@ -4,8 +4,9 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class CardCopy extends Model
+class CardCopy extends Card
 {
-    protected value;
-    protected name;
+    protected $name;
+    protected $effect;
+    protected $value;
 }

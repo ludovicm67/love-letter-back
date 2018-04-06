@@ -4,7 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Player extends Model
+abstract class Player extends Model
 {
-    //
+    //function to take a card from the pile
 }
