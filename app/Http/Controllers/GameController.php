@@ -78,6 +78,7 @@ class GameController extends Controller
           'is_human' => true // true if human, false if AI
         ]
       ],
+      'current_player' => 0,
       // playersNumber
       'players_number' => 1,
       // currentRound
@@ -86,9 +87,8 @@ class GameController extends Controller
         'pile' => [],
         // @FIXME: in English?
         'played_cards' => [],
-        'current_players' => [],
+        'current_players' => []
         // all players that are currently in game
-        'current_player' => 0
         // 'is_finished' => false // @FIXME: useful?
       ]
     ];
@@ -314,11 +314,13 @@ class GameController extends Controller
 
     // play while next player is an IA
     while (
-      !$state->finished && $state->players[$state->playing]->type == 'IA'
+      !$state->is_finished && !$state->players[$state->current_player]->is_human
     ) {
       $this->playIA($state, $params);
     }
 
+    // @TODO: events
+    // @TODO: store state in redis again
     return response()->json(['success' => true]);
   }
 
