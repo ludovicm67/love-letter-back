@@ -2,7 +2,7 @@
 
 use Illuminate\Database\Seeder;
 
-class PlayerExtensionTableSeeder extends Seeder
+class DeckPlayerTableSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -11,7 +11,7 @@ class PlayerExtensionTableSeeder extends Seeder
      */
     public function run()
     {
-        DB::table('player_extension')->insert([
+        DB::table('deck_player')->insert([
 	        [
 	        	'player_id' => 1,
 	        	'deck_id' => 1,
@@ -19,7 +19,11 @@ class PlayerExtensionTableSeeder extends Seeder
 	        [
 	        	'player_id' => 2,
 	        	'deck_id' => 1,
-	        ], 
+	        ],
+	        [
+	        	'player_id' => 3,
+	        	'deck_id' => 1,
+	        ],
         ]);
     }
 }

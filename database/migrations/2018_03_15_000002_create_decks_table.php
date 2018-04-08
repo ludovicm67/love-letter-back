@@ -14,7 +14,7 @@ class CreateDecksTable extends Migration
     public function up()
     {
         Schema::create('decks', function (Blueprint $table) {
-            $table->increments('deck_id');
+            $table->increments('id');
             $table->string('deck_name', 20);
         });
     }

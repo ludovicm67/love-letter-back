@@ -4,7 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class AI extends Player //abstract
+class Card_Deck extends Model
 {
-    //
+    protected $table = 'card_deck'; 
 }

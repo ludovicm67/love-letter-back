@@ -10,6 +10,9 @@ use Illuminate\Support\Facades\Redis;
 use Ramsey\Uuid\Uuid;
 use Validator;
 
+use App\Deck;
+//use App\Deck_Card;
+
 class GameController extends Controller
 {
     public function event() {
@@ -28,24 +31,71 @@ class GameController extends Controller
       return array_map([$this, 'getGameInfos'], Redis::keys('game:waiting:*'));
     }
 
+    /*for test purposes
+    public function winningRoundsRequired($playersNumber)
+    {
+    	if($playersNumber == 2)
+    	{
+    		$winningRounds = 7;
+    	}
+    	else if($playersNumber == 3)
+    	{
+    		$winningRounds = 5;
+    	}
+    	else
+    	{
+    		$winningRounds = 4;
+    	}
+    	return $winningRounds;
+    }*/
+
     public function create() {
       $gameId = Uuid::uuid4();
       $user = auth()->user();
       $gameInfos = [
+
+        //game_id
         'id' => $gameId,
-        'creator' => [
+
+        //creator
+        'creator' => [ //creator of the game
           'id' => $user->id,
           'name' => $user->name
         ],
-        'players' => [
+
+        //deck
+        'deck' => [
+          'content' => Deck::find(1)->cards,
+          'name' => Deck::find(1)->select('deck_name')->get()
+        ],
+
+        //isFinished
+        'isFinished' => false,
+
+        //participants
+        'participants' => [ //participants
           [
-            'id' => auth()->user()->id,
-            'name' => auth()->user()->name,
-            'type' => 'human'
+           	'id' => auth()->user()->id,
+           	'name' => auth()->user()->name,
+           	'hand' => array(),
+           	'wonRoundsNumber' => 0,
+           	'immunity' => false,
+           	'type' => true //true if human, false if AI
           ]
         ],
-        'finished' => false,
-        'playing' => 0 // index of players, to get the player which is playing
+
+        //playersNumber
+        'playersNumber' => count('participants'),
+
+        //currentRound
+		    'currentRound' => [ // currentRound
+          'number' => 0,
+          'pile' => array(),
+          'playedCards' => array(),
+          'inGamePlayers' => array(),
+          'currentPlayer' => 0,
+          'isFinished' => false
+        ]
       ];
 
       Redis::set('game:waiting:' . $gameId, json_encode($gameInfos));
@@ -164,7 +214,10 @@ class GameController extends Controller
       $me = [
         'id' => auth()->user()->id,
         'name' => auth()->user()->name,
-        'type' => 'human'
+        'hand' => array(),
+        'wonRoundsNumber' => 0,
+        'immunity' => false,
+        'type' => true
       ];
       if (isset($game->players) && !in_array($me, $game->players)) {
         $game->players[] = $me;

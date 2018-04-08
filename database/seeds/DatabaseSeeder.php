@@ -15,9 +15,9 @@ class DatabaseSeeder extends Seeder
       PlayersTableSeeder::class,
       CardsTableSeeder::class,
       DecksTableSeeder::class,
-      DeckCardTableSeeder::class,
+      CardDeckTableSeeder::class,
       FriendListTableSeeder::class,
-      PlayerExtensionTableSeeder::class,
+      DeckPlayerTableSeeder::class,
       OptionsTableSeeder::class,
     ]);
   }

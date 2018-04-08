@@ -2,7 +2,7 @@
 
 use Illuminate\Database\Seeder;
 
-class DeckCardTableSeeder extends Seeder
+class CardDeckTableSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -11,7 +11,7 @@ class DeckCardTableSeeder extends Seeder
      */
     public function run()
     {
-        DB::table('deck_card')->insert([
+        DB::table('card_deck')->insert([
 	        [
 	        	'deck_id' => 1,
 	        	'card_id' => 1,
