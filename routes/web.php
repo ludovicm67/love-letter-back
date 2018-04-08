@@ -1,5 +1,4 @@
 <?php
-
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -15,5 +14,5 @@ Route::get('/game', 'GameController@index');
 Route::get('/game/event', 'GameController@event');
 
 Route::get('/', function () {
-    return view('welcome');
+  return view('welcome');
 });

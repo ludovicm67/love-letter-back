@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Events;
 
 use Illuminate\Broadcasting\Channel;
@@ -12,27 +11,27 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 
 class NewGameEvent implements ShouldBroadcast
 {
-    use Dispatchable, InteractsWithSockets, SerializesModels;
+  use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $content;
+  public $content;
 
-    /**
-     * Create a new event instance.
-     *
-     * @return void
-     */
-    public function __construct($array = [])
-    {
-        $this->content = $array;
-    }
+  /**
+   * Create a new event instance.
+   *
+   * @return void
+   */
+  public function __construct($array = [])
+  {
+    $this->content = $array;
+  }
 
-    /**
-     * Get the channels the event should broadcast on.
-     *
-     * @return \Illuminate\Broadcasting\Channel|array
-     */
-    public function broadcastOn()
-    {
-        return new Channel('channel-game-list');
-    }
+  /**
+   * Get the channels the event should broadcast on.
+   *
+   * @return \Illuminate\Broadcasting\Channel|array
+   */
+  public function broadcastOn()
+  {
+    return new Channel('channel-game-list');
+  }
 }
