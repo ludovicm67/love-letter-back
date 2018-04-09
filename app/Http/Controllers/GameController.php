@@ -124,9 +124,7 @@ class GameController extends Controller
     Redis::rename($waitingKey, $startedKey);
 
     $gameInfos = $this->getGameInfos($startedKey);
-
-    //$gameInfos->current_round->pile = $gameInfos->deck->content;
-    // $gameInfos = $this->setPile($gameInfos);
+    $gameInfos = $this->setPile($gameInfos);
 
     return response()->json([
       'success' => true,
@@ -325,34 +323,34 @@ class GameController extends Controller
    * - the pile is sort out
    * - according to the players number, a few cards are taken from the pile and put away
    */
-
   public function setPile($gameInfos)
   {
     // create the pile
-    foreach ($gameInfos->deck->content as $card_copy) {
-      for ($i = 0; $i = $card_copy->number_copies; $i++) {
+    foreach ($gameInfos->deck->content as $card_copy) 
+    {
+      for ($i = 0; $i < $card_copy->number_copies; $i++) 
+      {
         array_push($gameInfos->current_round->pile, $card_copy);
       }
     }
 
-    /*
     // sort out the pile
     shuffle($gameInfos->current_round->pile);
 
-    //a few cards are taken away from the pile
-    if (($gameInfos->players_number) == 1) // should be 2, it's 1 because of test purposes
+    // a few cards are taken away from the pile
+    if (($gameInfos->players_number) == 2) 
     {
-      for ($i = 0; $i <= 3; $i++)
+      for ($i = 0; $i < 3; $i++) 
       {
         array_push($gameInfos->current_round->played_cards, $gameInfos->current_round->pile[$i]);
-        array_splice($gameInfos->current_round->pile, $i);
+        array_shift($gameInfos->current_round->pile);
       }
     }
-    else
+    else // for three or four players
     {
-      array_push($gameInfos->current_round->played_cards, $gameInfos->current_round->pile[$i]);
-      array_splice($gameInfos->current_round->pile, 0);
-    }*/
+      array_push($gameInfos->current_round->played_cards, $gameInfos->current_round->pile[0]);
+      array_shift($gameInfos->current_round->pile);
+    }
     return $gameInfos;
   }
 }
