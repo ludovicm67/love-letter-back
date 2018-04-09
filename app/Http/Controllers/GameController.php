@@ -31,30 +31,12 @@ class GameController extends Controller
     return array_map([$this, 'getGameInfos'], Redis::keys('game:waiting:*'));
   }
 
-  /*for test purposes
-    public function winningRoundsRequired($playersNumber)
-    {
-      if($playersNumber == 2)
-      {
-        $winningRounds = 7;
-      }
-      else if($playersNumber == 3)
-      {
-        $winningRounds = 5;
-      }
-      else
-      {
-        $winningRounds = 4;
-      }
-      return $winningRounds;
-    }*/
-
   public function create()
   {
     $gameId = Uuid::uuid4();
     $user = auth()->user();
     $gameInfos = [
-      // game_id
+      // id
       'id' => $gameId,
       // creator
       'creator' => ['id' => $user->id, 'name' => $user->name],
@@ -65,9 +47,11 @@ class GameController extends Controller
           ->select('deck_name')
           ->get()
       ],
-      // isFinished
+      // @TODO: winning_rounds;
+      // winning_rounds => function(),
+      // is_finished
       'is_finished' => false,
-      // participants
+      // players
       'players' => [
         [
           'id' => auth()->user()->id,
@@ -78,17 +62,16 @@ class GameController extends Controller
           'is_human' => true // true if human, false if AI
         ]
       ],
+      // current_player
       'current_player' => 0,
-      // playersNumber
+      // players_number
       'players_number' => 1,
-      // currentRound
+      // current_round
       'current_round' => [
         'number' => 0,
         'pile' => [],
         'played_cards' => [],
-        'current_players' => []
-        // all players that are currently in game
-        // 'is_finished' => false // @FIXME: useful?
+        'current_players' => [] // all players that are currently in game
       ]
     ];
 
@@ -332,6 +315,42 @@ class GameController extends Controller
   private function playHuman($state, $params)
   {
     // @TODO: edit the $state variable
+    return $state;
+  }
+
+  /* before each round, the pile is set up :
+   * - the pile is sort out
+   * - according to the players number, a few cards are taken from the pile and put away
+   */
+
+  public function setPile($state)
+  {
+    // create the pile
+    foreach ($state->deck->content as $card_copy)
+    {
+      for($i = 0; i = $card_copy->number_copies; i++)
+      {
+        array_push($state->current_round->pile, $card_copy);
+      }
+    }
+    
+    // sort out the pile
+    shuffle($state->current_round->pile);
+
+    //a few cards are taken away from the pile
+    if ($state->players_number) == 2) 
+    {
+      for ($i = 0; $i <= 3; $i++) 
+      {
+        array_push($state->current_round->played_cards, $state->current_round->pile[$i]);
+        array_splice($state->current_round->pile, $i);
+      }
+    } 
+    else 
+    {
+      array_push($state->current_round->played_cards, $state->current_round->pile[$i]);
+      array_splice($state->current_round->pile, 0);
+    }
     return $state;
   }
 }

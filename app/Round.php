@@ -35,7 +35,7 @@ class Round extends Model
     //sort out the pile
     if (count($inGamePlayers) == 2) {
       for ($i = 0; $i <= 3; $i++) {
-        setPlayedCards(array_values($inGamePlayers)[$i]);
+        setPlayedCards(array_values($inGamePlayers)[$i]); // what the fuck Martin ?!
         array_splice($pile, $i);
       }
     } else {
