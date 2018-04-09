@@ -13,6 +13,8 @@ use Validator;
 //use App\Deck_Card;
 class GameController extends Controller
 {
+  const MAX_PLAYERS = 4;
+
   // a simple event for some tests
   public function event()
   {
@@ -36,11 +38,8 @@ class GameController extends Controller
     $gameId = Uuid::uuid4();
     $user = auth()->user();
     $gameInfos = [
-      // id
       'id' => $gameId,
-      // creator
       'creator' => ['id' => $user->id, 'name' => $user->name],
-      // deck
       'deck' => [
         'content' => Deck::find(1)->cards,
         'name' => Deck::find(1)
@@ -49,24 +48,9 @@ class GameController extends Controller
       ],
       // @TODO: winning_rounds;
       // winning_rounds => function(),
-      // is_finished
       'is_finished' => false,
-      // players
-      'players' => [
-        [
-          'id' => auth()->user()->id,
-          'name' => auth()->user()->name,
-          'hand' => [],
-          'winning_rounds_count' => 0,
-          'immunity' => false,
-          'is_human' => true // true if human, false if AI
-        ]
-      ],
-      // current_player
+      'players' => [],
       'current_player' => 0,
-      // players_number
-      'players_number' => 1,
-      // current_round
       'current_round' => [
         'number' => 0,
         'pile' => [],
@@ -74,6 +58,9 @@ class GameController extends Controller
         'current_players' => [] // all players that are currently in game
       ]
     ];
+
+    // add me as a player
+    array_push($gameInfos['players'], $this->generateNewPlayer());
 
     Redis::set('game:waiting:' . $gameId, json_encode($gameInfos));
 
@@ -125,9 +112,10 @@ class GameController extends Controller
 
     $gameInfos = $this->getGameInfos($startedKey);
     $gameInfos = $this->setPile($gameInfos);
+
     $event = new UpdateGameInfosEvent(['games' => $this->getWaitingGames()]);
     event($event);
-    
+
     return response()->json([
       'success' => true,
       'data' => ['game_id' => $params['game_id'], 'game_infos' => $gameInfos]
@@ -144,6 +132,18 @@ class GameController extends Controller
   {
     $games = $this->getWaitingGames();
     return response()->json(['success' => true, 'data' => ['games' => $games]]);
+  }
+
+  private function generateNewPlayer()
+  {
+    return [
+      'id' => auth()->user()->id,
+      'name' => auth()->user()->name,
+      'hand' => [],
+      'winning_rounds_count' => 0,
+      'immunity' => false,
+      'is_human' => true
+    ];
   }
 
   public function join(Request $request)
@@ -178,17 +178,34 @@ class GameController extends Controller
 
     $user = auth()->user();
     $game = $this->getGameInfos($waitingKey);
-    $me = [
-      'id' => auth()->user()->id,
-      'name' => auth()->user()->name,
-      'hand' => [],
-      'wonRoundsNumber' => 0,
-      'immunity' => false,
-      'type' => true
-    ];
-    if (isset($game->players) && !in_array($me, $game->players)) {
-      $game->players[] = $me;
+
+    // in case we have too much players
+    if (isset($game->players) && count($game->players) >= self::MAX_PLAYERS) {
+      return response()->json([
+        'success' => false,
+        'error' => 'too many players'
+      ], 401);
     }
+
+    $me = $this->generateNewPlayer();
+
+    if (!isset($game->players)) {
+      return response()->json([
+        'success' => false,
+        'error' => 'game was badly initialized'
+      ], 400);
+      // @FIXME: in_array will not work as expected I think
+    } elseif (isset($game->players) && in_array($me, $game->players)) {
+      return response()->json([
+        'success' => false,
+        'error' => 'you already joined the game'
+      ], 409);
+    }
+
+    // add the new player
+    $game->players[] = $me;
+
+    // save the new state conataining the new player
     Redis::set($waitingKey, json_encode($game));
 
     return response()->json(['success' => true, 'data' => 'ok']);
@@ -328,10 +345,8 @@ class GameController extends Controller
   public function setPile($gameInfos)
   {
     // create the pile
-    foreach ($gameInfos->deck->content as $card_copy) 
-    {
-      for ($i = 0; $i < $card_copy->number_copies; $i++) 
-      {
+    foreach ($gameInfos->deck->content as $card_copy) {
+      for ($i = 0; $i < $card_copy->number_copies; $i++) {
         array_push($gameInfos->current_round->pile, $card_copy);
       }
     }
@@ -340,17 +355,20 @@ class GameController extends Controller
     shuffle($gameInfos->current_round->pile);
 
     // a few cards are taken away from the pile
-    if (($gameInfos->players_number) == 2) 
-    {
-      for ($i = 0; $i < 3; $i++) 
-      {
-        array_push($gameInfos->current_round->played_cards, $gameInfos->current_round->pile[$i]);
+    if (count($gameInfos->players) == 2) {
+      for ($i = 0; $i < 3; $i++) {
+        array_push(
+          $gameInfos->current_round->played_cards,
+          $gameInfos->current_round->pile[$i]
+        );
         array_shift($gameInfos->current_round->pile);
       }
-    }
-    else // for three or four players
-    {
-      array_push($gameInfos->current_round->played_cards, $gameInfos->current_round->pile[0]);
+    } else {
+      // for three or four players
+      array_push(
+        $gameInfos->current_round->played_cards,
+        $gameInfos->current_round->pile[0]
+      );
       array_shift($gameInfos->current_round->pile);
     }
     return $gameInfos;
