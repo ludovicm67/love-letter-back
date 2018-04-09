@@ -126,7 +126,7 @@ class GameController extends Controller
     $gameInfos = $this->getGameInfos($startedKey);
 
     //$gameInfos->current_round->pile = $gameInfos->deck->content;
-    $gameInfos = $this->setPile($gameInfos);
+    // $gameInfos = $this->setPile($gameInfos);
 
     return response()->json([
       'success' => true,
@@ -340,15 +340,15 @@ class GameController extends Controller
     shuffle($gameInfos->current_round->pile);
 
     //a few cards are taken away from the pile
-    if (($gameInfos->players_number) == 1) // should be 2, it's 1 because of test purposes 
+    if (($gameInfos->players_number) == 1) // should be 2, it's 1 because of test purposes
     {
-      for ($i = 0; $i <= 3; $i++) 
+      for ($i = 0; $i <= 3; $i++)
       {
         array_push($gameInfos->current_round->played_cards, $gameInfos->current_round->pile[$i]);
         array_splice($gameInfos->current_round->pile, $i);
       }
-    } 
-    else 
+    }
+    else
     {
       array_push($gameInfos->current_round->played_cards, $gameInfos->current_round->pile[$i]);
       array_splice($gameInfos->current_round->pile, 0);
