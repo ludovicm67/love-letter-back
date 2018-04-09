@@ -112,6 +112,7 @@ class GameController extends Controller
 
     $gameInfos = $this->getGameInfos($startedKey);
     $gameInfos = $this->setPile($gameInfos);
+    $gameInfos = $this->distributeCards($gameInfos);
 
     $event = new UpdateGameInfosEvent(['games' => $this->getWaitingGames()]);
     event($event);
@@ -369,6 +370,17 @@ class GameController extends Controller
         $gameInfos->current_round->played_cards,
         $gameInfos->current_round->pile[0]
       );
+      array_shift($gameInfos->current_round->pile);
+    }
+    return $gameInfos;
+  }
+
+  // after setting the pile, we need to distribute one card to each player
+  public function distributeCards($gameInfos)
+  {
+    foreach ($gameInfos->players as $player)
+    {
+      array_push($player->hand, $gameInfos->current_round->pile[0]);
       array_shift($gameInfos->current_round->pile);
     }
     return $gameInfos;
