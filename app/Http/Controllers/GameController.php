@@ -385,4 +385,12 @@ class GameController extends Controller
     }
     return $gameInfos;
   }
+
+  // when it's his turn to play, a player picks a card from the pile
+  public function pickCard($state)
+  {
+    array_push($state->players[$state->current_player]->hand, $state->current_round->pile[0]);
+    array_shift($state->current_round->pile);
+    return $state;
+  }
 }
