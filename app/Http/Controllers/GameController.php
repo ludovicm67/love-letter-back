@@ -329,14 +329,12 @@ class GameController extends Controller
   public function setPile($gameInfos)
   {
     // create the pile
-    foreach ($gameInfos->deck->content as $card_copy)
-    {
-      for($i = 0; $i = $card_copy->number_copies; $i++)
-      {
+    foreach ($gameInfos->deck->content as $card_copy) {
+      for ($i = 0; $i = $card_copy->number_copies; $i++) {
         array_push($gameInfos->current_round->pile, $card_copy);
       }
     }
-    
+
     /*
     // sort out the pile
     shuffle($gameInfos->current_round->pile);
