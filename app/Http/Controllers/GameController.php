@@ -1,15 +1,15 @@
 <?php
 namespace App\Http\Controllers;
 
+use App\Deck;
 use App\Events\DeleteGameEvent;
 use App\Events\NewGameEvent;
 use App\Events\TestEvent;
+use App\Events\UpdateGameInfosEvent;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redis;
 use Ramsey\Uuid\Uuid;
 use Validator;
-
-use App\Deck;
 //use App\Deck_Card;
 class GameController extends Controller
 {
@@ -123,10 +123,11 @@ class GameController extends Controller
     // start the game by renaming the key
     Redis::rename($waitingKey, $startedKey);
 
-    $gameInfos = $this->getGameInfos($startedKey);
-
     //$gameInfos->current_round->pile = $gameInfos->deck->content;
     // $gameInfos = $this->setPile($gameInfos);
+    $gameInfos = $this->getGameInfos($startedKey);
+    $event = new UpdateGameInfosEvent(['games' => $this->getWaitingGames()]);
+    event($event);
 
     return response()->json([
       'success' => true,
