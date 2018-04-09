@@ -85,7 +85,6 @@ class GameController extends Controller
       'current_round' => [
         'number' => 0,
         'pile' => [],
-        // @FIXME: in English?
         'played_cards' => [],
         'current_players' => []
         // all players that are currently in game
@@ -319,8 +318,8 @@ class GameController extends Controller
       $this->playIA($state, $params);
     }
 
-    // @TODO: events
-    // @TODO: store state in redis again
+    // @TODO: fire events
+    Redis::set($startedKey, json_encode($state));
     return response()->json(['success' => true]);
   }
 
