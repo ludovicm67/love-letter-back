@@ -125,6 +125,9 @@ class GameController extends Controller
 
     $gameInfos = $this->getGameInfos($startedKey);
 
+    //$gameInfos->current_round->pile = $gameInfos->deck->content;
+    $gameInfos = $this->setPile($gameInfos);
+
     return response()->json([
       'success' => true,
       'data' => ['game_id' => $params['game_id'], 'game_infos' => $gameInfos]
@@ -323,34 +326,35 @@ class GameController extends Controller
    * - according to the players number, a few cards are taken from the pile and put away
    */
 
-  public function setPile($state)
+  public function setPile($gameInfos)
   {
     // create the pile
-    foreach ($state->deck->content as $card_copy)
+    foreach ($gameInfos->deck->content as $card_copy)
     {
-      for($i = 0; i = $card_copy->number_copies; i++)
+      for($i = 0; $i = $card_copy->number_copies; $i++)
       {
-        array_push($state->current_round->pile, $card_copy);
+        array_push($gameInfos->current_round->pile, $card_copy);
       }
     }
     
+    /*
     // sort out the pile
-    shuffle($state->current_round->pile);
+    shuffle($gameInfos->current_round->pile);
 
     //a few cards are taken away from the pile
-    if ($state->players_number) == 2) 
+    if (($gameInfos->players_number) == 1) // should be 2, it's 1 because of test purposes 
     {
       for ($i = 0; $i <= 3; $i++) 
       {
-        array_push($state->current_round->played_cards, $state->current_round->pile[$i]);
-        array_splice($state->current_round->pile, $i);
+        array_push($gameInfos->current_round->played_cards, $gameInfos->current_round->pile[$i]);
+        array_splice($gameInfos->current_round->pile, $i);
       }
     } 
     else 
     {
-      array_push($state->current_round->played_cards, $state->current_round->pile[$i]);
-      array_splice($state->current_round->pile, 0);
-    }
-    return $state;
+      array_push($gameInfos->current_round->played_cards, $gameInfos->current_round->pile[$i]);
+      array_splice($gameInfos->current_round->pile, 0);
+    }*/
+    return $gameInfos;
   }
 }
