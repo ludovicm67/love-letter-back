@@ -5,6 +5,7 @@ use App\Deck;
 use App\Events\DeleteGameEvent;
 use App\Events\NewGameEvent;
 use App\Events\TestEvent;
+use App\Events\UpdateGameEvent;
 use App\Events\UpdateGameInfosEvent;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redis;
@@ -208,6 +209,14 @@ class GameController extends Controller
 
     // save the new state conataining the new player
     Redis::set($waitingKey, json_encode($game));
+
+    $event = new UpdateGameInfosEvent(['games' => $this->getWaitingGames()]);
+    event($event);
+
+    $event = new UpdateGameEvent($game->id, [
+      'game' => ['game_id' => $game->id, 'game_infos' => $game]
+    ]);
+    event($event);
 
     return response()->json(['success' => true, 'data' => 'ok']);
   }

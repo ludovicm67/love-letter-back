@@ -14,7 +14,7 @@ class UpdateGameEvent implements ShouldBroadcast
   use Dispatchable, InteractsWithSockets, SerializesModels;
 
   public $content;
-  public $game_id;
+  private $game_id;
 
   /**
    * Create a new event instance.
