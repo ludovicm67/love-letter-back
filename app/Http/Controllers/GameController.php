@@ -1,15 +1,15 @@
 <?php
 namespace App\Http\Controllers;
 
+use App\Deck;
 use App\Events\DeleteGameEvent;
 use App\Events\NewGameEvent;
 use App\Events\TestEvent;
+use App\Events\UpdateGameInfosEvent;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redis;
 use Ramsey\Uuid\Uuid;
 use Validator;
-
-use App\Deck;
 //use App\Deck_Card;
 class GameController extends Controller
 {
@@ -125,7 +125,9 @@ class GameController extends Controller
 
     $gameInfos = $this->getGameInfos($startedKey);
     $gameInfos = $this->setPile($gameInfos);
-
+    $event = new UpdateGameInfosEvent(['games' => $this->getWaitingGames()]);
+    event($event);
+    
     return response()->json([
       'success' => true,
       'data' => ['game_id' => $params['game_id'], 'game_infos' => $gameInfos]
