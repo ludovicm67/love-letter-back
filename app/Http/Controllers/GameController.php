@@ -1,17 +1,16 @@
 <?php
 namespace App\Http\Controllers;
 
-use App\Deck;
 use App\Events\DeleteGameEvent;
 use App\Events\NewGameEvent;
 use App\Events\TestEvent;
 use App\Events\UpdateGameEvent;
 use App\Events\UpdateGameInfosEvent;
+use App\Play;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redis;
-use Ramsey\Uuid\Uuid;
 use Validator;
-//use App\Deck_Card;
+
 class GameController extends Controller
 {
   const MAX_PLAYERS = 4;
@@ -36,32 +35,11 @@ class GameController extends Controller
 
   public function create()
   {
-    $gameId = Uuid::uuid4();
-    $user = auth()->user();
-    $gameInfos = [
-      'id' => $gameId,
-      'creator' => ['id' => $user->id, 'name' => $user->name],
-      'deck' => [
-        'content' => Deck::find(1)->cards,
-        'name' => Deck::find(1)
-          ->select('deck_name')
-          ->get()
-      ],
-      // @TODO: winning_rounds;
-      // winning_rounds => function(),
-      'is_finished' => false,
-      'players' => [],
-      'current_player' => 0,
-      'current_round' => [
-        'number' => 0,
-        'pile' => [],
-        'played_cards' => [],
-        'current_players' => [] // all players that are currently in game
-      ]
-    ];
+    $gameInfos = Play::generateNewGameState();
+    $gameId = $gameInfos['id'];
 
     // add me as a player
-    array_push($gameInfos['players'], $this->generateNewPlayer());
+    array_push($gameInfos['players'], Play::generateNewPlayer());
 
     Redis::set('game:waiting:' . $gameId, json_encode($gameInfos));
     Redis::expire('game:waiting:' . $gameId, 3600); // TTL at 1 hour
@@ -137,18 +115,6 @@ class GameController extends Controller
     return response()->json(['success' => true, 'data' => ['games' => $games]]);
   }
 
-  private function generateNewPlayer()
-  {
-    return [
-      'id' => auth()->user()->id,
-      'name' => auth()->user()->name,
-      'hand' => [],
-      'winning_rounds_count' => 0,
-      'immunity' => false,
-      'is_human' => true
-    ];
-  }
-
   public function join(Request $request)
   {
     $params = $request->only('game_id');
@@ -190,7 +156,7 @@ class GameController extends Controller
       ], 401);
     }
 
-    $me = $this->generateNewPlayer();
+    $me = Play::generateNewPlayer();
 
     if (!isset($game->players)) {
       return response()->json([
@@ -320,7 +286,12 @@ class GameController extends Controller
     $user = auth()->user();
     $state = $this->getGameInfos($startedKey);
 
-    $state = $this->playHuman($state, $params);
+    // the human player will now play
+    $state = Play::playHuman($state, $params);
+    $event = new UpdateGameEvent($params['game_id'], [
+      'game' => ['game_id' => $params['game_id'], 'game_infos' => $state]
+    ]);
+    event($event);
 
     // this return is just for debug purposes (will block the rest of the code)
     return response()->json(['success' => true, 'data' => ['game' => $state]]);
@@ -329,24 +300,16 @@ class GameController extends Controller
     while (
       !$state->is_finished && !$state->players[$state->current_player]->is_human
     ) {
-      $this->playIA($state, $params);
+      $state = Play::playIA($state, $params);
+      $event = new UpdateGameEvent($params['game_id'], [
+        'game' => ['game_id' => $params['game_id'], 'game_infos' => $state]
+      ]);
+      event($event);
     }
 
-    // @TODO: fire events
+    // save the state in redis again
     Redis::set($startedKey, json_encode($state));
-    return response()->json(['success' => true]);
-  }
-
-  private function playIA($state, $params)
-  {
-    // @TODO: edit the $state variable
-    return $state;
-  }
-
-  private function playHuman($state, $params)
-  {
-    // @TODO: edit the $state variable
-    return $state;
+    return response()->json(['success' => true, 'data' => ['game' => $state]]);
   }
 
   /* before each round, the pile is set up :
