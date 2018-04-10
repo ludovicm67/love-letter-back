@@ -64,6 +64,7 @@ class GameController extends Controller
     array_push($gameInfos['players'], $this->generateNewPlayer());
 
     Redis::set('game:waiting:' . $gameId, json_encode($gameInfos));
+    Redis::expire('game:waiting:' . $gameId, 3600); // TTL at 1 hour
 
     $event = new NewGameEvent([
       'game_id' => $gameId,
