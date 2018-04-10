@@ -30,7 +30,8 @@ class Play
         'pile' => [],
         'played_cards' => [],
         'current_players' => [] // all players that are currently in game
-      ]
+      ],
+      'test' => [] // just for testing purposes
     ];
   }
 
@@ -53,6 +54,9 @@ class Play
   {
     $user = auth()->user(); // if need to do something with the user informations
     // @TODO: edit the $state variable
+    // just a test
+    $state->test[] = $params;
+
     return $state;
   }
 

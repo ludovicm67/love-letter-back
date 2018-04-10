@@ -252,7 +252,7 @@ class GameController extends Controller
    **/
   public function play(Request $request)
   {
-    $params = $request->only('game_id');
+    $params = $request->only('game_id', 'action', 'card');
     $rules = [
       'game_id' => 'required|string|min:36|max:36|regex:/^[0-9a-z-]+$/'
     ];
