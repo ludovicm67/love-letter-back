@@ -137,7 +137,6 @@ class GameController extends Controller
       }
     }
 
-    $user = auth()->user();
     $game = $this->getGameInfos($waitingKey);
 
     // in case we have too much players
@@ -177,7 +176,7 @@ class GameController extends Controller
     ]);
     event($event);
 
-    return response()->json(['success' => true, 'data' => 'ok']);
+    return response()->json(['success' => true, 'data' => ['game' => $game]]);
   }
 
   /**
