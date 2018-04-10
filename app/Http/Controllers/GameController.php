@@ -15,14 +15,6 @@ class GameController extends Controller
 {
   const MAX_PLAYERS = 4;
 
-  // a simple event for some tests
-  public function event()
-  {
-    $event = new TestEvent(['hello' => 'world']);
-    event($event);
-    dd('ok');
-  }
-
   private function getGameInfos($key)
   {
     return json_decode(Redis::get($key));
