@@ -1,5 +1,5 @@
 <?php
-namespace App;
+namespace App\Game;
 
 use App\Deck;
 use Ramsey\Uuid\Uuid;

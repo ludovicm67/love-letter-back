@@ -6,7 +6,7 @@ use App\Events\NewGameEvent;
 use App\Events\TestEvent;
 use App\Events\UpdateGameEvent;
 use App\Events\UpdateGameInfosEvent;
-use App\Play;
+use App\Game\Play;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redis;
 use Validator;
