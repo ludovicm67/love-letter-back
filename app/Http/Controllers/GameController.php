@@ -3,6 +3,7 @@ namespace App\Http\Controllers;
 
 use App\Events\DeleteGameEvent;
 use App\Events\NewGameEvent;
+use App\Events\StartGameEvent;
 use App\Events\TestEvent;
 use App\Events\UpdateGameEvent;
 use App\Events\UpdateGameInfosEvent;
@@ -87,6 +88,11 @@ class GameController extends Controller
     $gameInfos = $this->distributeCards($gameInfos);
 
     $event = new UpdateGameInfosEvent(['games' => $this->getWaitingGames()]);
+    event($event);
+
+    $event = new StartGameEvent($params['game_id'], [
+      'game' => ['game_id' => $params['game_id'], 'game_infos' => $gameInfos]
+    ]);
     event($event);
 
     return response()->json([
