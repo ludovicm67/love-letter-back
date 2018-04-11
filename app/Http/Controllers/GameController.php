@@ -295,7 +295,7 @@ class GameController extends Controller
 
     // play while next player is an IA
     while (
-      !$state->is_finished && !$state->players[$state->current_player]->is_human
+      !$state->is_finished && $state->players[$state->current_player]->ia > 0
     ) {
       $state = Play::playIA($state, $params);
       $event = new UpdateGameEvent($params['game_id'], [
