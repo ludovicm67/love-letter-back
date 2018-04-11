@@ -59,6 +59,8 @@ class Play
     // just a test
     $state->test[] = $params;
 
+    nextplayer($state);
+
     return $state;
   }
 
@@ -81,27 +83,47 @@ class Play
     $state->players[$state->current_player]->immunity = false;
 
     $ia = $state->players[$state->current_player];
+    $carte;
+    if($ia->ia ==1) {
+      //ia aleatoire
+      $nbr = rand(0,1);
+      $carte = $ia->hand[nbr];
+      if($nbr==0) {
+        array_shift($state->players[$state->current_player]->hand);
+      }
+      else {
+        array_pop($state->players[$state->current_player]->hand);
+      }
+      array_push($state->current_round->played_cards, $carte);
 
-    //ia aleatoire
-    nbr = rand(0,1);
-    carte = $ia->hand[nbr];
-    if(nbr==0) {
-      array_shift($state->players[$state->current_player]->hand);
     }
-    else {
-      array_pop($state->players[$state->current_player]->hand);
+    else if($ia->ia==2) {
+
     }
-    array_push($state->current_round->played_cards, $carte);
+    $state = playactionsia($state, $carte, $ia->ia);
+    $state = next_player($state);
     return $state;
   }
 
-  public static function playactions($state,$carte) {
+  public static function playactionsia($state,$carte, $ia) {
     $cartenb = $carte->value;
-
 
     if($cartenb == 1) {
       //Choisissez un joueur et un nom de carte (excepté “Soldat”).
       //Si le joueur possède cette carte, il est éliminé.
+      if($ia==1) {
+        $playernbr = rand(0,count($state->players));
+        while(!playerisingame($state, $state->players[$playernbr]) && $playernbr != $state->current_player) {
+          $playernbr = rand(0,count($state->players));
+        }
+        $carte = rand(2,8);
+        if($state->players[$playernbr]->hand[0]->value == $carte) {
+          //joueur a perdu
+        }
+      }
+      else if($ia==2) {
+
+      }
     }
     else if ($cartenb==2) {
       //Consultez la main d’un joueur.
@@ -125,5 +147,43 @@ class Play
         //Si vous gardez cette carte en main, calculez le total des valeurs de votre main à chaque pioche.
         //Si celui-ci est égal ou supérieur à douze, vous êtes éliminé.
     }
+    else if(cartenb==8) {
+      //perdu
+    }
+
+    return $state;
+  }
+
+  public static function nextplayer($state) {
+    $state->current_player = $state->current_player +1 % count($state->players);
+    $p = $state->players[$state->current_player];
+    $find = false;
+    foreach($state->current_players as $cp) {
+      if($cp->id == $p->id) {
+        $find = true;
+      }
+    }
+    while(!$find) {
+      $state->current_player = $state->current_player +1 % count($state->players);
+      $p = $state->players[$state->current_player];
+      $find = false;
+      foreach($state->current_players as $cp) {
+        if($cp->id == $p->id) {
+          $find = true;
+        }
+      }
+    }
+    return $state;
+  }
+
+
+  public static function playerisingame($state, $player) {
+    $res = false;
+    foreach($state->current_players as $cp) {
+      if($cp->id == $player->id) {
+        $res = true;
+      }
+    }
+    return $res;
   }
 }
