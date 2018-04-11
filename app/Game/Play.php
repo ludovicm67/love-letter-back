@@ -45,7 +45,7 @@ class Play
       'hand' => [],
       'winning_rounds_count' => 0,
       'immunity' => false,
-      'is_human' => true
+      'ia' => 0
     ];
   }
 
