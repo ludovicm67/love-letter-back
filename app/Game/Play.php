@@ -98,7 +98,61 @@ class Play
 
     }
     else if($ia->ia==2) {
+        $newcard = $state->players[$state->current_player]->hand[1];
+        $oldcard = $state->players[$state->current_player]->hand[0];
 
+        if($newcard->value ==1){ //deviner carte d'un joueur
+          $carte = $newcard; //jouer 1 car ne permet pas de gagner
+          array_pop($state->players[$state->current_player]->hand);
+        }
+        else if($newcard->value ==2) { //regarder main autre joueur
+          $carte = $newcard; //jouer 2 car ne permet pas de gagner
+          array_pop($state->players[$state->current_player]->hand);
+        }
+        else if($newcard->value ==3) { //comparer main
+          if($oldcard->value>=6) { //si possede une carte eleve, elle tente comparaison
+            $carte = $newcard;
+            array_pop($state->players[$state->current_player]->hand);
+          }
+          else { //sinon joue autre carte
+            $carte = $oldcard;
+            array_shift($state->players[$state->current_player]->hand);
+          }
+        }
+        else if($newcard->value==4) { //immunité
+          $carte = $newcard; //joue la carte
+          array_pop($state->players[$state->current_player]->hand);
+        }
+        else if($newcard->value==5) { //nouveau tirage pour un joueur
+          $carte = $newcard; //joue cette carte car pas très élévée
+          array_pop($state->players[$state->current_player]->hand);
+        }
+        else if($newcard->value==6) { //échange main
+          if($oldcard->value<6) { //si petite main tente l'echange
+            $carte= $oldcard;
+            array_shift($state->players[$state->current_player]->hand);
+          }
+          else {//sinon joue autre
+            $carte = $newcard;
+            array_pop($state->players[$state->current_player]->hand);
+          }
+        }
+        else if($newcard->value==7) { //si garde main ne doit pas etre >12
+          if(count($state->current_round->current_players)==2) { //s'il reste que 2 joueur tente le coup
+            $carte= $oldcard;
+            array_shift($state->players[$state->current_player]->hand);
+          }
+          else { //sinon jete la carte
+            $carte = $newcard;
+            array_pop($state->players[$state->current_player]->hand);
+          }
+        }
+        else if($newcard->value==8) { //princesse si on la jete c'est perdu
+          $carte= $oldcard;
+          array_shift($state->players[$state->current_player]->hand);
+        }
+
+        array_push($state->current_round->played_cards, $carte);
     }
     $state = playactionsia($state, $carte, $ia->ia);
     $state = next_player($state);
@@ -245,7 +299,8 @@ class Play
   public static function playerhaslost($state, $playerindex) {
 
     unset($state->current_round->current_players[array_search($playerindex, $state->current_round->current_players)]);
-
+    $carte = array_pop($state->players[$playerindex]->hand);
+    array_push($state->current_round->played_cards, $carte);
     return $state;
   }
 }
