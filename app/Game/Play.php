@@ -170,14 +170,22 @@ class Play
         while(!playerisingame($state, $state->players[$playernbr]) || $playernbr == $state->current_player) {
           $playernbr = rand(0,count($state->players));
         }
-        $carte = rand(2,8);
-        if($state->players[$playernbr]->hand[0]->value == $carte && !$state->players[$playernbr]->immunity) {
+        $cartev = rand(2,8);
+        if($state->players[$playernbr]->hand[0]->value == $cartev && !$state->players[$playernbr]->immunity) {
           //joueur a perdu
           $state=playerhaslost($state, $playernbr);
         }
       }
       else if($ia==2) {
-
+        $playernbr = rand(0,count($state->players));
+        while(!playerisingame($state, $state->players[$playernbr]) || $playernbr == $state->current_player) {
+          $playernbr = rand(0,count($state->players));
+        }
+        $cartev = rand(2,5);
+        if($state->players[$playernbr]->hand[0]->value == $cartev && !$state->players[$playernbr]->immunity) {
+          //joueur a perdu
+          $state=playerhaslost($state, $playernbr);
+        }
       }
     }
     else if ($cartenb==2) {
@@ -187,7 +195,7 @@ class Play
     else if($cartenb==3) {
       //Choisissez un joueur et comparez votre main avec la sienne.
       //Le joueur avec la carte avec la valeur la moins élevée est éliminé.
-      if($ia==1) {
+
         $playernbr = rand(0,count($state->players));
         while(!playerisingame($state, $state->players[$playernbr]) || $playernbr == $state->current_player) {
           $playernbr = rand(0,count($state->players));
@@ -206,11 +214,6 @@ class Play
         else {
           //egalite
         }
-
-      }
-      else if($ia==2) {
-
-      }
     }
     else if($cartenb==4) {
       //Jusqu’à votre prochain tour, vous ignorez les effets des cartes des autres joueurs.
@@ -232,12 +235,25 @@ class Play
         array_shift($state->current_round->pile);
       }
       else if($ia==2) {
-
+          if($state->players[$state->current_player]->hand[0]->value <5) {
+            $playernbr=$state->current_player;
+          }
+          else {
+            $playernbr = rand(0,count($state->players));
+            while(!playerisingame($state, $state->players[$playernbr])) {
+              $playernbr = rand(0,count($state->players));
+            }
+          }
+          array_shift($state->players[$playernbr]->hand);
+          array_push(
+            $state->players[$playernbr]->hand,
+            $state->current_round->pile[0]
+          );
+          array_shift($state->current_round->pile);
       }
     }
     else if(cartenb==6) {
       //Choisissez un joueur et échangez votre main avec la sienne.
-      if($ia==1) {
         $playernbr = rand(0,count($state->players));
         while(!playerisingame($state, $state->players[$playernbr]) || $playernbr == $state->current_player) {
           $playernbr = rand(0,count($state->players));
@@ -248,10 +264,6 @@ class Play
         $state->players[$state->current_player]->hand = $handp;
         $state->players[$playernbr]->hand= $handc;
 
-      }
-      else if($ia==2) {
-
-      }
     }
     else if(cartenb==7) {
         //Si vous gardez cette carte en main, calculez le total des valeurs de votre main à chaque pioche.
