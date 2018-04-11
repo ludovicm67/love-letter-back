@@ -113,12 +113,13 @@ class Play
       //Si le joueur possède cette carte, il est éliminé.
       if($ia==1) {
         $playernbr = rand(0,count($state->players));
-        while(!playerisingame($state, $state->players[$playernbr]) && $playernbr != $state->current_player) {
+        while(!playerisingame($state, $state->players[$playernbr]) || $playernbr == $state->current_player) {
           $playernbr = rand(0,count($state->players));
         }
         $carte = rand(2,8);
-        if($state->players[$playernbr]->hand[0]->value == $carte) {
+        if($state->players[$playernbr]->hand[0]->value == $carte && !$state->players[$playernbr]->immunity) {
           //joueur a perdu
+          $state=playerhaslost($state, $playernbr);
         }
       }
       else if($ia==2) {
@@ -127,10 +128,35 @@ class Play
     }
     else if ($cartenb==2) {
       //Consultez la main d’un joueur.
+      //ne rien faire : ia pas capable de retenir ce qu'elle a vu
     }
     else if($cartenb==3) {
       //Choisissez un joueur et comparez votre main avec la sienne.
       //Le joueur avec la carte avec la valeur la moins élevée est éliminé.
+      if($ia==1) {
+        $playernbr = rand(0,count($state->players));
+        while(!playerisingame($state, $state->players[$playernbr]) || $playernbr == $state->current_player) {
+          $playernbr = rand(0,count($state->players));
+        }
+        if($state->players[$playernbr]->immunity) {
+          //rien ne se passe joueur a immunité
+        }
+        else if($state->players[$playernbr]->hand[0]->value >$state->players[$state->current_player]->hand[0]->value) {
+          //joueur current a perdu
+          $state=playerhaslost($state, $state->current_player);
+        }
+        else if($state->players[$playernbr]->hand[0]->value <$state->players[$state->current_player]->hand[0]->value) {
+          //autre joeur a perdu
+          $state=playerhaslost($state, $playernbr);
+        }
+        else {
+          //egalite
+        }
+
+      }
+      else if($ia==2) {
+
+      }
     }
     else if($cartenb==4) {
       //Jusqu’à votre prochain tour, vous ignorez les effets des cartes des autres joueurs.
@@ -139,9 +165,39 @@ class Play
     else if($cartenb==5) {
       //Choisissez un joueur ou vous-même.
       //Le joueur sélectionné défausse sa carte et en pioche une nouvelle
+      if($ia==1) {
+        $playernbr = rand(0,count($state->players));
+        while(!playerisingame($state, $state->players[$playernbr])) {
+          $playernbr = rand(0,count($state->players));
+        }
+        array_shift($state->players[$playernbr]->hand);
+        array_push(
+          $state->players[$playernbr]->hand,
+          $state->current_round->pile[0]
+        );
+        array_shift($state->current_round->pile);
+      }
+      else if($ia==2) {
+
+      }
     }
     else if(cartenb==6) {
       //Choisissez un joueur et échangez votre main avec la sienne.
+      if($ia==1) {
+        $playernbr = rand(0,count($state->players));
+        while(!playerisingame($state, $state->players[$playernbr]) || $playernbr == $state->current_player) {
+          $playernbr = rand(0,count($state->players));
+        }
+
+        $handc = $state->players[$state->current_player]->hand;
+        $handp =$state->players[$playernbr]->hand;
+        $state->players[$state->current_player]->hand = $handp;
+        $state->players[$playernbr]->hand= $handc;
+
+      }
+      else if($ia==2) {
+
+      }
     }
     else if(cartenb==7) {
         //Si vous gardez cette carte en main, calculez le total des valeurs de votre main à chaque pioche.
@@ -149,6 +205,7 @@ class Play
     }
     else if(cartenb==8) {
       //perdu
+      $state = playerhaslost($state, $state->current_player);
     }
 
     return $state;
@@ -156,19 +213,17 @@ class Play
 
   public static function nextplayer($state) {
     $state->current_player = $state->current_player +1 % count($state->players);
-    $p = $state->players[$state->current_player];
     $find = false;
-    foreach($state->current_players as $cp) {
-      if($cp->id == $p->id) {
+    foreach($state->current_round->current_players as $cp) {
+      if($cp == $state->current_player) {
         $find = true;
       }
     }
     while(!$find) {
       $state->current_player = $state->current_player +1 % count($state->players);
-      $p = $state->players[$state->current_player];
       $find = false;
-      foreach($state->current_players as $cp) {
-        if($cp->id == $p->id) {
+      foreach($state->current_round->current_players as $cp) {
+        if($cp == $state->current_player) {
           $find = true;
         }
       }
@@ -179,11 +234,18 @@ class Play
 
   public static function playerisingame($state, $player) {
     $res = false;
-    foreach($state->current_players as $cp) {
-      if($cp->id == $player->id) {
+    foreach($state->current_round->current_players as $cp) {
+      if($state->players[$cp]->id== $player->id) {
         $res = true;
       }
     }
     return $res;
+  }
+
+  public static function playerhaslost($state, $playerindex) {
+
+    unset($state->current_round->current_players[array_search($playerindex, $state->current_round->current_players)]);
+
+    return $state;
   }
 }
