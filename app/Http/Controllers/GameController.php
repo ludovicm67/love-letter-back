@@ -297,6 +297,7 @@ class GameController extends Controller
     while (
       !$state->is_finished && !$state->players[$state->current_player]->is_human
     ) {
+      pickCard($state);
       $state = Play::playIA($state, $params);
       $event = new UpdateGameEvent($params['game_id'], [
         'game' => ['game_id' => $params['game_id'], 'game_infos' => $state]
