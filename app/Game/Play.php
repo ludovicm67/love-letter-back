@@ -289,24 +289,13 @@ class Play
 
   private static function nextplayer($state)
   {
-    $state->current_player =
-      $state->current_player + 1 % count($state->players);
-    $find = false;
-    foreach ($state->current_round->current_players as $cp) {
-      if ($cp == $state->current_player) {
-        $find = true;
-      }
-    }
-    while (!$find) {
+    $find = false
+    do {
       $state->current_player =
         $state->current_player + 1 % count($state->players);
-      $find = false;
-      foreach ($state->current_round->current_players as $cp) {
-        if ($cp == $state->current_player) {
-          $find = true;
-        }
-      }
-    }
+      $find = self::playerisingame($state->current_player);
+    }while(!$find)
+    
     return $state;
   }
 
