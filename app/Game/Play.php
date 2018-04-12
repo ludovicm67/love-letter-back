@@ -59,7 +59,7 @@ class Play
     // just a test
     array_push($state->test, $params);
 
-    self::nextplayer($state);
+    self::nextPlayer($state);
 
     return $state;
   }
@@ -169,7 +169,7 @@ class Play
       if ($ia == 1) {
         $playernbr = rand(0, count($state->players));
         while (
-          !self::playerisingame($state, $state->players[$playernbr]) ||
+          !self::playerIsInGame($state, $state->players[$playernbr]) ||
           $playernbr == $state->current_player
         ) {
           $playernbr = rand(0, count($state->players));
@@ -180,12 +180,12 @@ class Play
           !$state->players[$playernbr]->immunity
         ) {
           //joueur a perdu
-          $state = self::playerhaslost($state, $playernbr);
+          $state = self::playerHasLost($state, $playernbr);
         }
       } elseif ($ia == 2) {
         $playernbr = rand(0, count($state->players));
         while (
-          !self::playerisingame($state, $state->players[$playernbr]) ||
+          !self::playerIsInGame($state, $state->players[$playernbr]) ||
           $playernbr == $state->current_player
         ) {
           $playernbr = rand(0, count($state->players));
@@ -196,7 +196,7 @@ class Play
           !$state->players[$playernbr]->immunity
         ) {
           //joueur a perdu
-          $state = self::playerhaslost($state, $playernbr);
+          $state = self::playerHasLost($state, $playernbr);
         }
       }
     } elseif ($cartenb == 2) {
@@ -207,7 +207,7 @@ class Play
       //Le joueur avec la carte avec la valeur la moins élevée est éliminé.
       $playernbr = rand(0, count($state->players));
       while (
-        !self::playerisingame($state, $state->players[$playernbr]) ||
+        !self::playerIsInGame($state, $state->players[$playernbr]) ||
         $playernbr == $state->current_player
       ) {
         $playernbr = rand(0, count($state->players));
@@ -219,13 +219,13 @@ class Play
         $state->players[$state->current_player]->hand[0]->value
       ) {
         //joueur current a perdu
-        $state = self::playerhaslost($state, $state->current_player);
+        $state = self::playerHasLost($state, $state->current_player);
       } elseif (
         $state->players[$playernbr]->hand[0]->value <
         $state->players[$state->current_player]->hand[0]->value
       ) {
         //autre joeur a perdu
-        $state = self::playerhaslost($state, $playernbr);
+        $state = self::playerHasLost($state, $playernbr);
       } else {
         //egalite
       }
@@ -237,7 +237,7 @@ class Play
       //Le joueur sélectionné défausse sa carte et en pioche une nouvelle
       if ($ia == 1) {
         $playernbr = rand(0, count($state->players));
-        while (!self::playerisingame($state, $state->players[$playernbr])) {
+        while (!self::playerIsInGame($state, $state->players[$playernbr])) {
           $playernbr = rand(0, count($state->players));
         }
         array_shift($state->players[$playernbr]->hand);
@@ -251,7 +251,7 @@ class Play
           $playernbr = $state->current_player;
         } else {
           $playernbr = rand(0, count($state->players));
-          while (!self::playerisingame($state, $state->players[$playernbr])) {
+          while (!self::playerIsInGame($state, $state->players[$playernbr])) {
             $playernbr = rand(0, count($state->players));
           }
         }
@@ -266,7 +266,7 @@ class Play
       //Choisissez un joueur et échangez votre main avec la sienne.
       $playernbr = rand(0, count($state->players));
       while (
-        !self::playerisingame($state, $state->players[$playernbr]) ||
+        !self::playerIsInGame($state, $state->players[$playernbr]) ||
         $playernbr == $state->current_player
       ) {
         $playernbr = rand(0, count($state->players));
@@ -281,25 +281,25 @@ class Play
       //Si celui-ci est égal ou supérieur à douze, vous êtes éliminé.
     } elseif (cartenb == 8) {
       //perdu
-      $state = self::playerhaslost($state, $state->current_player);
+      $state = self::playerHasLost($state, $state->current_player);
     }
 
     return $state;
   }
 
-  private static function nextplayer($state)
+  private static function nextPlayer($state)
   {
     $find = false;
     do {
       $state->current_player =
         $state->current_player + 1 % count($state->players);
-      $find = self::playerisingame($state->current_player);
+      $find = self::playerIsInGame($state->current_player);
     }while(!$find)
 
     return $state;
   }
 
-  private static function playerisingame($state, $player)
+  private static function playerIsInGame($state, $player)
   {
     $res = false;
     foreach ($state->current_round->current_players as $cp) {
@@ -310,7 +310,7 @@ class Play
     return $res;
   }
 
-  private static function playerhaslost($state, $playerindex)
+  private static function playerHasLost($state, $playerindex)
   {
     unset(
       $state->current_round->current_players[
