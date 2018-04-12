@@ -57,7 +57,7 @@ class Play
     $user = auth()->user(); // if need to do something with the user informations
     // @TODO: edit the $state variable
     // just a test
-    array_push($state->test, $params);
+    $state->test[] = $params;
 
     self::nextPlayer($state);
 
@@ -289,12 +289,16 @@ class Play
 
   private static function nextPlayer($state)
   {
+    $currentPlayer = $state->current_player;
     $find = false;
     do {
       $state->current_player =
-        $state->current_player + 1 % count($state->players);
-      $find = self::playerIsInGame($state->current_player);
-    }while(!$find);
+        ($state->current_player + 1) % count($state->players);
+      $find = self::playerIsInGame($state, $state->current_player);
+      if ($state->current_player === $currentPlayer) {
+        return $state;
+      }
+    } while (!$find);
 
     return $state;
   }

@@ -95,6 +95,8 @@ class GameController extends Controller
     ]);
     event($event);
 
+    Redis::set($waitingKey, json_encode($gameInfos));
+
     return response()->json([
       'success' => true,
       'data' => ['game_id' => $params['game_id'], 'game_infos' => $gameInfos]
@@ -290,6 +292,10 @@ class GameController extends Controller
     ]);
     event($event);
 
+    // @TODO: move this at the bottom
+    // save the state in redis again
+    Redis::set($startedKey, json_encode($state));
+
     // this return is just for debug purposes (will block the rest of the code)
     return response()->json(['success' => true, 'data' => ['game' => $state]]);
 
@@ -303,10 +309,8 @@ class GameController extends Controller
         'game' => ['game_id' => $params['game_id'], 'game_infos' => $state]
       ]);
       event($event);
+      sleep(2);
     }
-
-    // save the state in redis again
-    Redis::set($startedKey, json_encode($state));
     return response()->json(['success' => true, 'data' => ['game' => $state]]);
   }
 
