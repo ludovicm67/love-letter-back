@@ -15,7 +15,9 @@ class CreateCardsTable extends Migration
     Schema::create('cards', function (Blueprint $table) {
       $table->increments('id');
       $table->string('card_name', 15);
-      $table->string('effect', 150);
+      $table->boolean('choose_players');
+      $table->boolean('choose_players_or_me');
+      $table->boolean('choose_card_name');
       $table->integer('value');
       $table->integer('number_copies');
     });
