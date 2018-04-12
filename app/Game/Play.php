@@ -294,7 +294,7 @@ class Play
       $state->current_player =
         $state->current_player + 1 % count($state->players);
       $find = self::playerIsInGame($state->current_player);
-    }while(!$find)
+    }while(!$find);
 
     return $state;
   }
