@@ -59,37 +59,39 @@ class Play
     $state->players[$state->current_player]->immunity = false; // put immunity to false, in case it was true
     $user = auth()->user(); // if need to do something with the user informations
 
-    //@Todo
-    //array_push($state->current_round->playedCards, 
-               //[$$state->players[$state->current_round->current_player]->hand[array_search($playedCard, $state->players[$state->current_round->$current_player]->hand)]);
-    
+    $key_card = array_search($playedCard, array_column($state->players[$state->current_player]->hand, 'value')); // discard the card that has been played
+    array_push($state->current_round->playedCards, 
+              [$state->current_player, $state->players[$state->current_player]->hand[$key_card]]);
+    if($key_card == 0)
+    {
+      array_shift($state->players[$state->current_player]->hand);
+    }
+    else if($key_card == 1)
+    {
+      array_pop($state->players[$state->current_player]->hand);
+    }
+
     if($params->playedCard == 1) // Soldier
     {
       if($params->choosenCardName == $state->players[$params->choosenPlayer]->hand[0]->card_name)
       {
-        if($state->players[$params->choosenPlayer]->immunity != true)
-        {
-          $state = self::playerHasLost($state, $params->choosenPlayer);
-        }
+        $state = self::playerHasLost($state, $params->choosenPlayer);
       }
     }
     else if($params->playedCard == 3) // Knight
     {
-      if($state->players[$state->current_round->current_player]->hand[0]->value > $state->players[$params->choosenPlayer]->hand[0]->value)
+      if($state->players[$state->current_player]->hand[0]->value > $state->players[$params->choosenPlayer]->hand[0]->value)
       {
-        if($state->players[$params->choosenPlayer]->immunity != true)
-        {
-          $state = self::playerHasLost($state, $params->choosenPlayer);
-        }
+        $state = self::playerHasLost($state, $params->choosenPlayer);
       }
-      else if($state->players[$state->current_round->current_player]->hand[0]->value < $state->players[$params->choosenPlayer]->hand[0]->value)
+      else if($state->players[$state->players[$state->current_player]->hand[0]->value < $state->players[$params->choosenPlayer]->hand[0]->value)
       {
-        $state = self::playerHasLost($state, $state->current_round->current_player);
+        $state = self::playerHasLost($state, $state->current_player);
       }
     }
     else if($params->playedCard == 4) // Priestess
     {
-      $state->players[$state->current_round->current_player]->immunity = true;
+      $state->players[$state->current_player]->immunity = true;
     }
     else if($params->playedCard == 5) // Sorcerer
     {
@@ -99,13 +101,13 @@ class Play
     }
     else if($params->playedCard == 6) // General
     {
-      $card = $state->players[$state->current_round->current_player]->hand[0];
-      $state->players[$state->current_round->current_player]->hand[0] = $state->players[$params->choosenPlayer]->hand[0];
-      $state->players[$params->choosenPlayer]->hand[0] = $card;
+        $card = $state->players[$state->current_round->current_player]->hand[0];
+        $state->players[$state->current_player]->hand[0] = $state->players[$params->choosenPlayer]->hand[0];
+        $state->players[$params->choosenPlayer]->hand[0] = $card;
     }
     else if($params->playedCard == 8) // Princess/Prince
     {
-      $state = self::playerHasLost($state, $state->current_round->current_player);
+      $state = self::playerHasLost($state, $state->current_player);
     }
 
     // just a test
