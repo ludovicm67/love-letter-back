@@ -89,6 +89,10 @@ class GameController extends Controller
     $gameInfos = Play::setPile($gameInfos);
     $gameInfos = Play::distributeCards($gameInfos);
 
+    unset($gameInfos->slots);
+
+    Redis::set($startedKey, json_encode($gameInfos));
+
     $event = new UpdateGameInfosEvent(['games' => $this->getWaitingGames()]);
     event($event);
 
@@ -96,8 +100,6 @@ class GameController extends Controller
       'game' => ['game_id' => $params['game_id'], 'game_infos' => $gameInfos]
     ]);
     event($event);
-
-    Redis::set($waitingKey, json_encode($gameInfos));
 
     return response()->json([
       'success' => true,
@@ -199,6 +201,7 @@ class GameController extends Controller
     //  -  1 : Player3
     //  -  2 : Player4
     // VALUE =
+    //  - -2 : used slot (a player is already in)
     //  - -1 : closed slot
     //  -  0 : human player slot
     //  -  1 : IA easy slot
@@ -207,7 +210,7 @@ class GameController extends Controller
     $rules = [
       'game_id' => 'required|string|min:36|max:36|regex:/^[0-9a-z-]+$/',
       'slot' => 'required|integer|min:0|max:2',
-      'value' => 'required|integer|min:-1|max:2'
+      'value' => 'required|integer|min:-2|max:2'
     ];
     $validator = Validator::make($params, $rules);
     if ($validator->fails()) {
