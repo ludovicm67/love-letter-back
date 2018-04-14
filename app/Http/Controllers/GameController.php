@@ -191,6 +191,71 @@ class GameController extends Controller
     return response()->json(['success' => true, 'data' => ['game' => $game]]);
   }
 
+  public function slots(Request $request)
+  {
+    // Player1 is already the creator, cannot change it
+    // SLOT =
+    //  -  0 : Player2
+    //  -  1 : Player3
+    //  -  2 : Player4
+    // VALUE =
+    //  - -1 : closed slot
+    //  -  0 : human player slot
+    //  -  1 : IA easy slot
+    //  -  2 : IA difficult slot
+    $params = $request->only('game_id', 'slot', 'value');
+    $rules = [
+      'game_id' => 'required|string|min:36|max:36|regex:/^[0-9a-z-]+$/',
+      'slot' => 'required|integer|min:0|max:2',
+      'value' => 'required|integer|min:-1|max:2'
+    ];
+    $validator = Validator::make($params, $rules);
+    if ($validator->fails()) {
+      return response()->json([
+        'success' => false,
+        'error' => $validator->messages()
+      ]);
+    }
+
+    $waitingKey = 'game:waiting:' . $params['game_id'];
+    $startedKey = 'game:started:' . $params['game_id'];
+    if (!Redis::exists($waitingKey)) {
+      if (Redis::exists($startedKey)) {
+        return response()->json([
+          'success' => false,
+          'message' => 'game already started'
+        ], 401);
+      } else {
+        return response()->json([
+          'success' => false,
+          'message' => 'game not found'
+        ], 404);
+      }
+    }
+
+    $game = $this->getGameInfos($waitingKey);
+    if ($game->creator->id != auth()->user()->id) {
+      return response()->json([
+        'success' => false,
+        'message' => 'only the game creator can change slots permissions'
+      ], 401);
+    }
+
+    $game->slots[$params['slot']] = intval($params['value']);
+
+    Redis::set($waitingKey, json_encode($game));
+
+    $event = new UpdateGameInfosEvent(['games' => $this->getWaitingGames()]);
+    event($event);
+
+    $event = new UpdateGameEvent($game->id, [
+      'game' => ['game_id' => $game->id, 'game_infos' => $game]
+    ]);
+    event($event);
+
+    return response()->json(['success' => true, 'data' => ['game' => $game]]);
+  }
+
   /**
    * DELETING PART
    **/

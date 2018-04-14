@@ -20,6 +20,8 @@ class Play
           ->select('deck_name')
           ->get()
       ],
+      'slots' => [0, 0, 0],
+      // to handle all kind of players
       'winning_rounds' => 0,
       'is_finished' => false,
       'players' => [],
@@ -56,57 +58,66 @@ class Play
    */
   public static function playHuman($state, $params)
   {
-    $state->players[$state->current_player]->immunity = false; // put immunity to false, in case it was true
+    $state->players[$state->current_player]->immunity = false;
+    // put immunity to false, in case it was true
     $user = auth()->user(); // if need to do something with the user informations
 
-    $key_card = array_search($playedCard, array_column($state->players[$state->current_player]->hand, 'value')); // discard the card that has been played
-    array_push($state->current_round->playedCards, 
-              [$state->current_player, $state->players[$state->current_player]->hand[$key_card]]);
-    if($key_card == 0)
-    {
+    $key_card = array_search(
+      $playedCard,
+      array_column($state->players[$state->current_player]->hand, 'value')
+    ); // discard the card that has been played
+    array_push($state->current_round->playedCards, [
+      $state->current_player,
+      $state->players[$state->current_player]->hand[$key_card]
+    ]);
+    if ($key_card == 0) {
       array_shift($state->players[$state->current_player]->hand);
-    }
-    else if($key_card == 1)
-    {
+    } elseif ($key_card == 1) {
       array_pop($state->players[$state->current_player]->hand);
     }
 
-    if($params->playedCard == 1) // Soldier
-    {
-      if($params->choosenCardName == $state->players[$params->choosenPlayer]->hand[0]->card_name)
-      {
+    if ($params->playedCard == 1) {
+      // Soldier
+      if (
+        $params->choosenCardName ==
+        $state->players[$params->choosenPlayer]->hand[0]->card_name
+      ) {
         $state = self::playerHasLost($state, $params->choosenPlayer);
       }
-    }
-    else if($params->playedCard == 3) // Knight
-    {
-      if($state->players[$state->current_player]->hand[0]->value > $state->players[$params->choosenPlayer]->hand[0]->value)
-      {
+    } elseif ($params->playedCard == 3) {
+      // Knight
+      if (
+        $state->players[$state->current_player]->hand[0]->value >
+        $state->players[$params->choosenPlayer]->hand[0]->value
+      ) {
         $state = self::playerHasLost($state, $params->choosenPlayer);
-      }
-      else if($state->players[$state->current_player]->hand[0]->value < $state->players[$params->choosenPlayer]->hand[0]->value)
-      {
+      } elseif (
+        $state->players[$state->current_player]->hand[0]->value <
+        $state->players[$params->choosenPlayer]->hand[0]->value
+      ) {
         $state = self::playerHasLost($state, $state->current_player);
       }
-    }
-    else if($params->playedCard == 4) // Priestess
-    {
+    } elseif ($params->playedCard == 4) {
+      // Priestess
       $state->players[$state->current_player]->immunity = true;
-    }
-    else if($params->playedCard == 5) // Sorcerer
-    {
-      array_push($state->current_round->played_cards, [$params->choosenPlayer, $state->players[$params->choosenPlayer]->hand[0]]);
+    } elseif ($params->playedCard == 5) {
+      // Sorcerer
+      array_push($state->current_round->played_cards, [
+        $params->choosenPlayer,
+        $state->players[$params->choosenPlayer]->hand[0]
+      ]);
       array_pop($state->players[$params->choosenPlayer]->hand);
       $state = self::pickCard($state);
-    }
-    else if($params->playedCard == 6) // General
-    {
-        $card = $state->players[$state->current_round->current_player]->hand[0];
-        $state->players[$state->current_player]->hand[0] = $state->players[$params->choosenPlayer]->hand[0];
-        $state->players[$params->choosenPlayer]->hand[0] = $card;
-    }
-    else if($params->playedCard == 8) // Princess/Prince
-    {
+    } elseif ($params->playedCard == 6) {
+      // General
+      $card = $state->players[$state->current_round->current_player]->hand[0];
+      $state->players[$state->current_player]->hand[0] = $state->players[
+        $params->choosenPlayer
+      ]->
+        hand[0];
+      $state->players[$params->choosenPlayer]->hand[0] = $card;
+    } elseif ($params->playedCard == 8) {
+      // Princess/Prince
       $state = self::playerHasLost($state, $state->current_player);
     }
 
@@ -382,16 +393,11 @@ class Play
   // according to the players number, they'll need a certain number of winning rounds to win the game
   public static function setWinningRounds($gameInfos)
   {
-    if(count($gameInfos->players) == 2)
-    {
+    if (count($gameInfos->players) == 2) {
       $gameInfos->winning_rounds = 7;
-    }
-    else if(count($gameInfos->players) == 3)
-    {
+    } elseif (count($gameInfos->players) == 3) {
       $gameInfos->winning_rounds = 5;
-    }
-    else if(count($gameInfos->players) == 4)
-    {
+    } elseif (count($gameInfos->players) == 4) {
       $gameInfos->winning_rounds = 4;
     }
     return $gameInfos;
