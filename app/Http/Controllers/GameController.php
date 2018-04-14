@@ -8,6 +8,7 @@ use App\Events\TestEvent;
 use App\Events\UpdateGameEvent;
 use App\Events\UpdateGameInfosEvent;
 use App\Game\Play;
+use App\Game\State;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redis;
 use Validator;
@@ -157,13 +158,15 @@ class GameController extends Controller
 
     $me = Play::generateNewPlayer();
 
+    // bad game initialization
     if (!isset($game->players)) {
       return response()->json([
         'success' => false,
         'error' => 'game was badly initialized'
       ], 400);
-      // @FIXME: in_array will not work as expected I think
-    } elseif (isset($game->players) && in_array($me, $game->players)) {
+    }
+
+    if (in_array($me['id'], State::getPlayersId($game))) {
       return response()->json([
         'success' => false,
         'error' => 'you already joined the game'
