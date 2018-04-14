@@ -84,7 +84,7 @@ class Play
       {
         $state = self::playerHasLost($state, $params->choosenPlayer);
       }
-      else if($state->players[$state->players[$state->current_player]->hand[0]->value < $state->players[$params->choosenPlayer]->hand[0]->value)
+      else if($state->players[$state->current_player]->hand[0]->value < $state->players[$params->choosenPlayer]->hand[0]->value)
       {
         $state = self::playerHasLost($state, $state->current_player);
       }
@@ -95,7 +95,7 @@ class Play
     }
     else if($params->playedCard == 5) // Sorcerer
     {
-      array_push($state->current_round->played_cards, [$params->choosenPlayer, $state->players[$params->choosenPlayer]->hand[0]);
+      array_push($state->current_round->played_cards, [$params->choosenPlayer, $state->players[$params->choosenPlayer]->hand[0]]);
       array_pop($state->players[$params->choosenPlayer]->hand);
       $state = self::pickCard($state);
     }
