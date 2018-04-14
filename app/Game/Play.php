@@ -20,8 +20,7 @@ class Play
           ->select('deck_name')
           ->get()
       ],
-      // @TODO: winning_rounds;
-      // winning_rounds => function(),
+      'winning_rounds' => 0,
       'is_finished' => false,
       'players' => [],
       'current_player' => 0,
@@ -49,18 +48,70 @@ class Play
     ];
   }
 
-  // a human player is playing
+  /* a human player is playing
+   * $params can contain :
+   * playedCard
+   * choosenPlayer
+   * choosenCardName
+   */
   public static function playHuman($state, $params)
   {
-    //put immunity to false, in case it was true
-    $state->players[$state->current_player]->immunity = false;
+    $state->players[$state->current_player]->immunity = false; // put immunity to false, in case it was true
     $user = auth()->user(); // if need to do something with the user informations
-    // @TODO: edit the $state variable
+
+    //@Todo
+    //array_push($state->current_round->playedCards, 
+               //[$$state->players[$state->current_round->current_player]->hand[array_search($playedCard, $state->players[$state->current_round->$current_player]->hand)]);
+    
+    if($params->playedCard == 1) // Soldier
+    {
+      if($params->choosenCardName == $state->players[$params->choosenPlayer]->hand[0]->card_name)
+      {
+        if($state->players[$params->choosenPlayer]->immunity != true)
+        {
+          $state = self::playerHasLost($state, $params->choosenPlayer);
+        }
+      }
+    }
+    else if($params->playedCard == 3) // Knight
+    {
+      if($state->players[$state->current_round->current_player]->hand[0]->value > $state->players[$params->choosenPlayer]->hand[0]->value)
+      {
+        if($state->players[$params->choosenPlayer]->immunity != true)
+        {
+          $state = self::playerHasLost($state, $params->choosenPlayer);
+        }
+      }
+      else if($state->players[$state->current_round->current_player]->hand[0]->value < $state->players[$params->choosenPlayer]->hand[0]->value)
+      {
+        $state = self::playerHasLost($state, $state->current_round->current_player);
+      }
+    }
+    else if($params->playedCard == 4) // Priestess
+    {
+      $state->players[$state->current_round->current_player]->immunity = true;
+    }
+    else if($params->playedCard == 5) // Sorcerer
+    {
+      array_push($state->current_round->played_cards, [$params->choosenPlayer, $state->players[$params->choosenPlayer]->hand[0]);
+      array_pop($state->players[$params->choosenPlayer]->hand);
+      $state = self::pickCard($state);
+    }
+    else if($params->playedCard == 6) // General
+    {
+      $card = $state->players[$state->current_round->current_player]->hand[0];
+      $state->players[$state->current_round->current_player]->hand[0] = $state->players[$params->choosenPlayer]->hand[0];
+      $state->players[$params->choosenPlayer]->hand[0] = $card;
+    }
+    else if($params->playedCard == 8) // Princess/Prince
+    {
+      $state = self::playerHasLost($state, $state->current_round->current_player);
+    }
+
     // just a test
     $state->test[] = $params;
-
     self::nextPlayer($state);
-
+    // distributeCards for the next player here ?!
     return $state;
   }
 
@@ -154,12 +205,12 @@ class Play
 
       array_push($state->current_round->played_cards, $carte);
     }
-    $state = self::playactionsia($state, $carte, $ia->ia);
+    $state = self::playActionsAI($state, $carte, $ia->ia);
     $state = self::next_player($state);
     return $state;
   }
 
-  private static function playactionsia($state, $carte, $ia)
+  private static function playActionsAI($state, $carte, $ia)
   {
     $cartenb = $carte->value;
 
@@ -314,15 +365,90 @@ class Play
     return $res;
   }
 
-  private static function playerHasLost($state, $playerindex)
+  private static function playerHasLost($state, $playerIndex)
   {
     unset(
       $state->current_round->current_players[
-        array_search($playerindex, $state->current_round->current_players)
+        array_search($playerIndex, $state->current_round->current_players)
       ]
     );
-    $carte = array_pop($state->players[$playerindex]->hand);
-    array_push($state->current_round->played_cards, $carte);
+    $card = array_pop($state->players[$playerIndex]->hand);
+    array_push($state->current_round->played_cards, [$playerIndex, $card]);
+    return $state;
+  }
+
+  // according to the players number, they'll need a certain number of winning rounds to win the game
+  public static function setWinningRounds($gameInfos)
+  {
+    if(count($gameInfos->players) == 2)
+    {
+      $gameInfos->winning_rounds = 7;
+    }
+    else if(count($gameInfos->players) == 3)
+    {
+      $gameInfos->winning_rounds = 5;
+    }
+    else if(count($gameInfos->players) == 4)
+    {
+      $gameInfos->winning_rounds = 4;
+    }
+    return $gameInfos;
+  }
+
+  /* before each round, the pile is set up :
+   * - the pile is sort out
+   * - according to the players number, a few cards are taken from the pile and put away
+   */
+  public static function setPile($gameInfos)
+  {
+    // create the pile
+    foreach ($gameInfos->deck->content as $card_copy) {
+      for ($i = 0; $i < $card_copy->number_copies; $i++) {
+        array_push($gameInfos->current_round->pile, $card_copy);
+      }
+    }
+
+    // sort out the pile
+    shuffle($gameInfos->current_round->pile);
+
+    // a few cards are taken away from the pile
+    if (count($gameInfos->players) == 2) {
+      for ($i = 0; $i < 3; $i++) {
+        array_push(
+          $gameInfos->current_round->played_cards,
+          $gameInfos->current_round->pile[$i]
+        );
+        array_shift($gameInfos->current_round->pile);
+      }
+    } else {
+      // for three or four players
+      array_push(
+        $gameInfos->current_round->played_cards,
+        $gameInfos->current_round->pile[0]
+      );
+      array_shift($gameInfos->current_round->pile);
+    }
+    return $gameInfos;
+  }
+
+  // after setting the pile, we need to distribute one card to each player
+  public static function distributeCards($gameInfos)
+  {
+    foreach ($gameInfos->players as $player) {
+      array_push($player->hand, $gameInfos->current_round->pile[0]);
+      array_shift($gameInfos->current_round->pile);
+    }
+    return $gameInfos;
+  }
+
+  // when it's his turn to play, a player picks a card from the pile
+  public static function pickCard($state)
+  {
+    array_push(
+      $state->players[$state->current_player]->hand,
+      $state->current_round->pile[0]
+    );
+    array_shift($state->current_round->pile);
     return $state;
   }
 }

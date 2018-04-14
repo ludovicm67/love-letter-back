@@ -13,14 +13,14 @@ class PlayersTableSeeder extends Seeder
     DB::table('players')->insert([
       [
         'name' => 'Aloy',
-        'password' => bcrypt('HorizonZeroDawn'),
+        'password' => bcrypt('hzd'),
         'points' => 1500,
         'won_games' => 1,
         'lost_games' => 3
       ],
       [
         'name' => 'Toothless',
-        'password' => bcrypt('HowToTrainYourDragon'),
+        'password' => bcrypt('httyd'),
         'points' => 750,
         'won_games' => 3,
         'lost_games' => 1

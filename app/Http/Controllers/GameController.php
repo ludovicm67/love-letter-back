@@ -85,8 +85,9 @@ class GameController extends Controller
     Redis::rename($waitingKey, $startedKey);
 
     $gameInfos = $this->getGameInfos($startedKey);
-    $gameInfos = $this->setPile($gameInfos);
-    $gameInfos = $this->distributeCards($gameInfos);
+    $gameInfos = Play::setWinningRounds($gameInfos);
+    $gameInfos = Play::setPile($gameInfos);
+    $gameInfos = Play::distributeCards($gameInfos);
 
     $event = new UpdateGameInfosEvent(['games' => $this->getWaitingGames()]);
     event($event);
@@ -315,62 +316,5 @@ class GameController extends Controller
       sleep(2);
     }
     return response()->json(['success' => true, 'data' => ['game' => $state]]);
-  }
-
-  /* before each round, the pile is set up :
-   * - the pile is sort out
-   * - according to the players number, a few cards are taken from the pile and put away
-   */
-  public function setPile($gameInfos)
-  {
-    // create the pile
-    foreach ($gameInfos->deck->content as $card_copy) {
-      for ($i = 0; $i < $card_copy->number_copies; $i++) {
-        array_push($gameInfos->current_round->pile, $card_copy);
-      }
-    }
-
-    // sort out the pile
-    shuffle($gameInfos->current_round->pile);
-
-    // a few cards are taken away from the pile
-    if (count($gameInfos->players) == 2) {
-      for ($i = 0; $i < 3; $i++) {
-        array_push(
-          $gameInfos->current_round->played_cards,
-          $gameInfos->current_round->pile[$i]
-        );
-        array_shift($gameInfos->current_round->pile);
-      }
-    } else {
-      // for three or four players
-      array_push(
-        $gameInfos->current_round->played_cards,
-        $gameInfos->current_round->pile[0]
-      );
-      array_shift($gameInfos->current_round->pile);
-    }
-    return $gameInfos;
-  }
-
-  // after setting the pile, we need to distribute one card to each player
-  public function distributeCards($gameInfos)
-  {
-    foreach ($gameInfos->players as $player) {
-      array_push($player->hand, $gameInfos->current_round->pile[0]);
-      array_shift($gameInfos->current_round->pile);
-    }
-    return $gameInfos;
-  }
-
-  // when it's his turn to play, a player picks a card from the pile
-  public function pickCard($state)
-  {
-    array_push(
-      $state->players[$state->current_player]->hand,
-      $state->current_round->pile[0]
-    );
-    array_shift($state->current_round->pile);
-    return $state;
   }
 }
