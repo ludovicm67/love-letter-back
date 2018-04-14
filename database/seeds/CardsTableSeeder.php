@@ -12,7 +12,7 @@ class CardsTableSeeder extends Seeder
   {
     DB::table('cards')->insert([
       [
-        'card_name' => 'Soldier',
+        'card_name' => 'soldier',
         'choose_players' => 1,
         'choose_players_or_me' => 0,
         'choose_card_name' => 1,
@@ -20,7 +20,7 @@ class CardsTableSeeder extends Seeder
         'number_copies' => 5
       ],
       [
-        'card_name' => 'Clown',
+        'card_name' => 'clown',
         'choose_players' => 1,
         'choose_players_or_me' => 0,
         'choose_card_name' => 0,
@@ -28,7 +28,7 @@ class CardsTableSeeder extends Seeder
         'number_copies' => 2
       ],
       [
-        'card_name' => 'Knight',
+        'card_name' => 'knight',
         'choose_players' => 1,
         'choose_players_or_me' => 0,
         'choose_card_name' => 0,
@@ -36,7 +36,7 @@ class CardsTableSeeder extends Seeder
         'number_copies' => 2
       ],
       [
-        'card_name' => 'Priestess',
+        'card_name' => 'priestess',
         'choose_players' => 0,
         'choose_players_or_me' => 0,
         'choose_card_name' => 0,
@@ -44,7 +44,7 @@ class CardsTableSeeder extends Seeder
         'number_copies' => 2
       ],
       [
-        'card_name' => 'Sorcerer',
+        'card_name' => 'sorcerer',
         'choose_players' => 1,
         'choose_players_or_me' => 1,
         'choose_card_name' => 0,
@@ -52,7 +52,7 @@ class CardsTableSeeder extends Seeder
         'number_copies' => 2
       ],
       [
-        'card_name' => 'General',
+        'card_name' => 'general',
         'choose_players' => 1,
         'choose_players_or_me' => 0,
         'choose_card_name' => 0,
@@ -60,7 +60,7 @@ class CardsTableSeeder extends Seeder
         'number_copies' => 1
       ],
       [
-        'card_name' => 'Minister',
+        'card_name' => 'minister',
         'choose_players' => 0,
         'choose_players_or_me' => 0,
         'choose_card_name' => 0,
@@ -68,7 +68,7 @@ class CardsTableSeeder extends Seeder
         'number_copies' => 1
       ],
       [
-        'card_name' => 'Princess/Prince',
+        'card_name' => 'princess_prince',
         'choose_players' => 0,
         'choose_players_or_me' => 0,
         'choose_card_name' => 0,
