@@ -360,7 +360,8 @@ class GameController extends Controller
       'choosen_card_name'
     );
     $rules = [
-      'game_id' => 'required|string|min:36|max:36|regex:/^[0-9a-z-]+$/'
+      'game_id' => 'required|string|min:36|max:36|regex:/^[0-9a-z-]+$/',
+      'action' => 'required|string'
     ];
     $validator = Validator::make($params, $rules);
     if ($validator->fails()) {
@@ -386,8 +387,14 @@ class GameController extends Controller
       }
     }
 
-    $user = auth()->user();
     $state = $this->getGameInfos($startedKey);
+
+    if (!State::isCurrentPlayer($state)) {
+      return response()->json([
+        'success' => false,
+        'message' => 'not your turn to play; be patient!'
+      ], 401);
+    }
 
     // the human player will now play
     $state = Play::playHuman($state, $params);

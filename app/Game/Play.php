@@ -63,13 +63,9 @@ class Play
     // put immunity to false, in case it was true
     $user = auth()->user(); // if need to do something with the user informations
 
-    if($params['action'] == 'pick_card')
-    {
+    if ($params['action'] == 'pick_card') {
       $state = self::pickCard($state);
-    }
-    else if($params['action'] == 'play_card')
-    {
-
+    } elseif ($params['action'] == 'play_card') {
       $key_card = array_search(
         $params['played_card'],
         array_column($state->players[$state->current_player]->hand, 'value')
@@ -414,8 +410,7 @@ class Play
   // before every round, every player is in game
   public static function setCurrentPlayers($gameInfos)
   {
-    for($i = 0; $i < count($gameInfos->players); $i++) 
-    {
+    for ($i = 0; $i < count($gameInfos->players); $i++) {
       array_push($gameInfos->current_round->current_players, $i);
     }
     return $gameInfos;
