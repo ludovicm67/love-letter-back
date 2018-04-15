@@ -15,8 +15,6 @@ use Validator;
 
 class GameController extends Controller
 {
-  const MAX_PLAYERS = 4;
-
   private function getGameInfos($key)
   {
     return json_decode(Redis::get($key));
@@ -153,7 +151,14 @@ class GameController extends Controller
     $game = $this->getGameInfos($waitingKey);
 
     // in case we have too much players
-    if (isset($game->players) && count($game->players) >= self::MAX_PLAYERS) {
+    $maxPlayers = 4;
+    if ($game->slots[2] == -1) {
+      $maxPlayers--;
+    }
+    if ($game->slots[1] == -1) {
+      $maxPlayers--;
+    }
+    if (isset($game->players) && count($game->players) >= $maxPlayers) {
       return response()->json([
         'success' => false,
         'error' => 'too many players'
