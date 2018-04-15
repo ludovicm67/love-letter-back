@@ -419,13 +419,6 @@ class GameController extends Controller
     ]);
     event($event);
 
-    // @TODO: move this at the bottom
-    // save the state in redis again
-    Redis::set($startedKey, json_encode($state));
-
-    // this return is just for debug purposes (will block the rest of the code)
-    return response()->json(['success' => true, 'data' => ['game' => $state]]);
-
     // play while next player is an IA
     while (
       !$state->is_finished && $state->players[$state->current_player]->ia > 0
@@ -438,6 +431,9 @@ class GameController extends Controller
       event($event);
       sleep(2);
     }
+
+    // save the state in redis again
+    Redis::set($startedKey, json_encode($state));
     return response()->json(['success' => true, 'data' => ['game' => $state]]);
   }
 }

@@ -82,8 +82,7 @@ class Play
     $user = auth()->user(); // if need to do something with the user informations
 
     if ($params['action'] == 'pick_card') {
-      if(count($state->players[$state->current_player]->hand) == 1)
-      {
+      if (count($state->players[$state->current_player]->hand) == 1) {
         $state = self::pickCard($state);
       }
     } elseif ($params['action'] == 'play_card') {
