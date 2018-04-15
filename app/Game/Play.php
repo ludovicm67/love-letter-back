@@ -52,9 +52,9 @@ class Play
 
   /* a human player is playing
    * $params can contain :
-   * playedCard
-   * choosenPlayer
-   * choosenCardName
+   * played_card
+   * choosen_player
+   * choosen_card_name
    */
   public static function playHuman($state, $params)
   {
@@ -110,7 +110,7 @@ class Play
       $state = self::pickCard($state);
     } elseif ($params['played_card'] == 6) {
       // General
-      $card = $state->players[$state->current_round->current_player]->hand[0];
+      $card = $state->players[$state->current_player]->hand[0];
       $state->players[$state->current_player]->hand[0] = $state->players[
         $params['choosen_player']
       ]->
@@ -124,8 +124,6 @@ class Play
     // just a test
     $state->test[] = $params;
     $state = self::nextPlayer($state);
-
-    // pickCard for the next player here ?!
     return $state;
   }
 
@@ -458,6 +456,16 @@ class Play
       $state->current_round->pile[0]
     );
     array_shift($state->current_round->pile);
+    if($state->players[$state->current_player]->hand[0]->card_name == 'minister')
+    {
+      if(($state->players[$state->current_player]->hand[0]->value + $state->players[$state->current_player]->hand[1]->value) >= 12)
+      {
+        array_push($state->current_round->played_cards, [$state->current_player, $state->players[$state->current_player]->hand[1]]);
+        array_pop($state->players[$state->current_player]->hand);
+        $state = self::playerHasLost($state, $state->current_player);
+        $state = self::nextPlayer($state);
+      }
+    }
     return $state;
   }
 }
