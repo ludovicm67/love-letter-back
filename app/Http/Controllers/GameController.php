@@ -152,12 +152,12 @@ class GameController extends Controller
 
     // in case we have too much players
     $maxPlayers = 4;
-    if ($game->slots[2] == -1) {
-      $maxPlayers--;
+    foreach ($game->slots as $slot) {
+      if ($slot != 0) {
+        $maxPlayers--;
+      }
     }
-    if ($game->slots[1] == -1) {
-      $maxPlayers--;
-    }
+
     if (isset($game->players) && count($game->players) >= $maxPlayers) {
       return response()->json([
         'success' => false,

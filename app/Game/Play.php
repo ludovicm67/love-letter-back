@@ -50,6 +50,24 @@ class Play
     ];
   }
 
+  // initial state for a new IA
+  public static function generateNewIA($level)
+  {
+    $name = 'IA';
+    if ($level > 1) {
+      $name = 'IA++';
+    }
+
+    return [
+      'id' => round(microtime(true) * 10000),
+      'name' => $name,
+      'hand' => [],
+      'winning_rounds_count' => 0,
+      'immunity' => false,
+      'ia' => $level
+    ];
+  }
+
   /* a human player is playing
    * $params can contain :
    * action
