@@ -257,6 +257,11 @@ class GameController extends Controller
     ) {
       $game->slots[1] = $game->slots[2];
       $game->slots[2] = -1;
+    } elseif (
+      $params['slot'] == 2 && $params['value'] != -1 && $game->slots[1] == -1
+    ) {
+      $game->slots[1] = intval($params['value']);
+      $game->slots[2] = -1;
     } else {
       $game->slots[$params['slot']] = intval($params['value']);
     }
