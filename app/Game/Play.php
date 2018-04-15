@@ -402,6 +402,16 @@ class Play
     return $gameInfos;
   }
 
+  // before every round, every player is in game
+  public static function setCurrentPlayers($gameInfos)
+  {
+    for($i = 0; $i < $count($gameInfos->players); $i++) 
+    {
+      array_push($gameInfos->current_round->current_players, $i);
+    }
+    return $gameInfos;
+  }
+
   /* before each round, the pile is set up :
    * - the pile is sort out
    * - according to the players number, a few cards are taken from the pile and put away

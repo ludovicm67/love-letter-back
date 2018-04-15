@@ -86,6 +86,7 @@ class GameController extends Controller
 
     $gameInfos = $this->getGameInfos($startedKey);
     $gameInfos = Play::setWinningRounds($gameInfos);
+    $gameInfos = Play::setCurrentPlayers($gameInfos);
     $gameInfos = Play::setPile($gameInfos);
     $gameInfos = Play::distributeCards($gameInfos);
 
