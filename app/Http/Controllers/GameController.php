@@ -349,6 +349,7 @@ class GameController extends Controller
   {
     $params = $request->only(
       'game_id',
+      'action',
       'played_card',
       'choosen_player',
       'choosen_card_name'
