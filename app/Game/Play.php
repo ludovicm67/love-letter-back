@@ -456,11 +456,20 @@ class Play
       $state->current_round->pile[0]
     );
     array_shift($state->current_round->pile);
-    if($state->players[$state->current_player]->hand[0]->card_name == 'minister')
-    {
-      if(($state->players[$state->current_player]->hand[0]->value + $state->players[$state->current_player]->hand[1]->value) >= 12)
-      {
-        array_push($state->current_round->played_cards, [$state->current_player, $state->players[$state->current_player]->hand[1]]);
+    if (
+      $state->players[$state->current_player]->hand[0]->card_name == 'minister'
+    ) {
+      if (
+        (
+          $state->players[$state->current_player]->hand[0]->value +
+          $state->players[$state->current_player]->hand[1]->value
+        ) >=
+        12
+      ) {
+        array_push($state->current_round->played_cards, [
+          $state->current_player,
+          $state->players[$state->current_player]->hand[1]
+        ]);
         array_pop($state->players[$state->current_player]->hand);
         $state = self::playerHasLost($state, $state->current_player);
         $state = self::nextPlayer($state);

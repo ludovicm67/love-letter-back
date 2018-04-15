@@ -244,7 +244,22 @@ class GameController extends Controller
       ], 401);
     }
 
-    $game->slots[$params['slot']] = intval($params['value']);
+    if ($params['slot'] == 0 && $params['value'] == -1) {
+      return response()->json([
+        'success' => false,
+        'message' => 'cannot remove player2'
+      ], 401);
+    }
+
+    // only close slots at the end
+    if (
+      $params['slot'] == 1 && $params['value'] == -1 && $game->slots[2] != -1
+    ) {
+      $game->slots[1] = $game->slots[2];
+      $game->slots[2] = -1;
+    } else {
+      $game->slots[$params['slot']] = intval($params['value']);
+    }
 
     Redis::set($waitingKey, json_encode($game));
 
