@@ -74,7 +74,7 @@ class Play
         $params['played_card'],
         array_column($state->players[$state->current_player]->hand, 'value')
       ); // discard the card that has been played
-      array_push($state->current_round->playedCards, [
+      array_push($state->current_round->played_cards, [
         $state->current_player,
         $state->players[$state->current_player]->hand[$key_card]
       ]);
@@ -379,7 +379,7 @@ class Play
   {
     $res = false;
     foreach ($state->current_round->current_players as $cp) {
-      if ($state->players[$cp]->id == $player->id) {
+      if ($state->players[$cp]->id == $state->players[$player]->id) {
         $res = true;
       }
     }
