@@ -149,6 +149,7 @@ class GameController extends Controller
     }
 
     $game = $this->getGameInfos($waitingKey);
+    $nbPlayers = count($game->players);
 
     // in case we have too much players
     $maxPlayers = 4;
@@ -157,8 +158,7 @@ class GameController extends Controller
         $maxPlayers--;
       }
     }
-
-    if (isset($game->players) && count($game->players) >= $maxPlayers) {
+    if (isset($game->players) && $nbPlayers >= $maxPlayers) {
       return response()->json([
         'success' => false,
         'error' => 'too many players'
@@ -182,8 +182,24 @@ class GameController extends Controller
       ], 409);
     }
 
-    // add the new player
-    $game->players[] = $me;
+    // add all IA before me
+    while ($nbPlayers < 4 && $game->slots[$nbPlayers - 1] > 0) {
+      $game->players[] = Play::generateNewIA($game->slots[$nbPlayers - 1]);
+      $nbPlayers++;
+    }
+
+    // add me
+    if ($nbPlayers < 4 && $game->slots[$nbPlayers - 1] == 0) {
+      $game->players[] = $me;
+      $game->slots[$nbPlayers - 2] = -2;
+      $nbPlayers++;
+    }
+
+    // add all IA after me
+    while ($nbPlayers < 4 && $game->slots[$nbPlayers - 1] > 0) {
+      $game->players[] = Play::generateNewIA($game->slots[$nbPlayers - 1]);
+      $nbPlayers++;
+    }
 
     // save the new state conataining the new player
     Redis::set($waitingKey, json_encode($game));
