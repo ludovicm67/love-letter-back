@@ -193,7 +193,7 @@ class GameController extends Controller
       ], 400);
     }
 
-    if (in_array($me['id'], State::getPlayersId($game))) {
+    if (in_array($me->id, State::getPlayersId($game))) {
       return response()->json([
         'success' => false,
         'error' => 'you already joined the game'
