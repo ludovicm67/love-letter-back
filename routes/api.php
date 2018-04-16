@@ -7,7 +7,7 @@ Route::post('login', 'AuthController@login');
 Route::group(['middleware' => ['jwt.auth']], function () {
   Route::get('logout', 'AuthController@logout');
 
-  Route::get('game/create', 'GameController@create');
+  Route::post('game/create', 'GameController@create');
   Route::get('game/list', 'GameController@list');
   Route::get('game/waitlist', 'GameController@waitlist');
   Route::post('game/join', 'GameController@join');

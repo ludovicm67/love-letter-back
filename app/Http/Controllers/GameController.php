@@ -25,10 +25,30 @@ class GameController extends Controller
     return array_map([$this, 'getGameInfos'], Redis::keys('game:waiting:*'));
   }
 
-  public function create()
+  public function create(Request $request)
   {
+    $params = $request->only('slot2', 'slot3', 'slot4');
+    $rules = [
+      'slot2' => 'required|integer|min:-1|max:2',
+      'slot3' => 'required|integer|min:-1|max:2',
+      'slot4' => 'required|integer|min:-1|max:2'
+    ];
+    $validator = Validator::make($params, $rules);
+    if ($validator->fails()) {
+      return response()->json([
+        'success' => false,
+        'error' => $validator->messages()
+      ]);
+    }
+
     $gameInfos = Play::generateNewGameState();
     $gameId = $gameInfos['id'];
+
+    // init the slots array
+    $gameInfos['slots'] = [];
+    $gameInfos['slots'][] = intval($params['slot2']);
+    $gameInfos['slots'][] = intval($params['slot3']);
+    $gameInfos['slots'][] = intval($params['slot4']);
 
     // add me as a player
     array_push($gameInfos['players'], Play::generateNewPlayer());
@@ -215,18 +235,17 @@ class GameController extends Controller
     return response()->json(['success' => true, 'data' => ['game' => $game]]);
   }
 
-// Player1 is already the creator, cannot change it
-// SLOT =
-//  -  0 : Player2
-//  -  1 : Player3
-//  -  2 : Player4
-// VALUE =
-//  - -2 : used slot (a player is already in)
-//  - -1 : closed slot
-//  -  0 : human player slot
-//  -  1 : IA easy slot
-//  -  2 : IA difficult slot
-
+  // Player1 is already the creator, cannot change it
+  // SLOT =
+  //  -  0 : Player2
+  //  -  1 : Player3
+  //  -  2 : Player4
+  // VALUE =
+  //  - -2 : used slot (a player is already in)
+  //  - -1 : closed slot
+  //  -  0 : human player slot
+  //  -  1 : IA easy slot
+  //  -  2 : IA difficult slot
   /**
    * DELETING PART
    **/
