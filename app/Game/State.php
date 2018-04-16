@@ -57,7 +57,8 @@ class State
     }
 
     return (object) [
-      'id' => round(microtime(true) * 10000), // just to send a unique ID
+      'id' => round(microtime(true) * 10000),
+      // just to send a unique ID
       'name' => $name,
       'hand' => [],
       'winning_rounds_count' => 0,

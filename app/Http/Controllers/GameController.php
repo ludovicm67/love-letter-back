@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 use App\Events\DeleteGameEvent;
 use App\Events\NewGameEvent;
 use App\Events\StartGameEvent;
-use App\Events\TestEvent;
 use App\Events\UpdateGameEvent;
 use App\Events\UpdateGameInfosEvent;
 use App\Game\Play;
@@ -184,7 +183,7 @@ class GameController extends Controller
       ], 403);
     }
 
-    $me = Play::generateNewPlayer();
+    $me = State::newPlayer();
 
     // bad game initialization
     if (!isset($game->players)) {
@@ -253,9 +252,7 @@ class GameController extends Controller
     $user = auth()->user();
     if (Redis::exists($key)) {
       $game = $this->getGameInfos($key);
-      if (
-        isset($game->creator->id) && $game->creator->id == $user->id
-      ) {
+      if (isset($game->creator->id) && $game->creator->id == $user->id) {
         Redis::del($key);
         $event = new DeleteGameEvent(['games' => $this->getWaitingGames()]);
         event($event);
