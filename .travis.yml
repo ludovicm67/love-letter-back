@@ -2,9 +2,8 @@ language: php
 
 # versions that we want to test (Laravel 5.5 requires PHP >= 7.0)
 php:
-  - "7.0"
   - "7.1"
-  - "7.2"
+  - "7.0"
 
 cache:
   directories:
@@ -24,4 +23,4 @@ before_script:
 
 script:
   - vendor/bin/phpunit
-  - if [[ ${TRAVIS_PHP_VERSION:0:3} == "7.1" ]]; then curl -L "$DEPLOY_REQUEST_URL"; fi
+  - if [ "$TRAVIS_BRANCH" = "master" -a "$TRAVIS_PULL_REQUEST" = "false" ]; then if [[ ${TRAVIS_PHP_VERSION:0:3} == "7.1" ]]; then curl -L "$DEPLOY_REQUEST_URL"; fi; fi
