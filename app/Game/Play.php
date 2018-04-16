@@ -3,102 +3,6 @@ namespace App\Game;
 
 class Play
 {
-  /* a human player is playing
-   * $params can contain :
-   * action
-   * played_card
-   * choosen_player
-   * choosen_card_name
-   */
-  public static function playHuman($state, $params)
-  {
-    $state->players[$state->current_player]->immunity = false;
-    // put immunity to false, in case it was true
-    $user = auth()->user(); // if need to do something with the user informations
-
-    if ($params['action'] == 'pick_card') {
-      if (count($state->players[$state->current_player]->hand) == 1) {
-        $state = self::pickCard($state);
-      }
-    } elseif ($params['action'] == 'play_card') {
-      $key_card = array_search(
-        $params['played_card'],
-        array_column($state->players[$state->current_player]->hand, 'value')
-      ); // discard the card that has been played
-      array_push($state->current_round->played_cards, [
-        $state->current_player,
-        $state->players[$state->current_player]->hand[$key_card]
-      ]);
-      if ($key_card == 0) {
-        array_shift($state->players[$state->current_player]->hand);
-      } elseif ($key_card == 1) {
-        array_pop($state->players[$state->current_player]->hand);
-      }
-
-      if ($params['played_card'] == 1) {
-        // Soldier
-        if (
-          $params['choosen_card_name'] ==
-          $state->players[$params['choosen_player']]->hand[0]->card_name
-        ) {
-          $state = self::playerHasLost($state, $params['choosen_player']);
-        }
-      } elseif ($params['played_card'] == 3) {
-        // Knight
-        if (
-          $state->players[$state->current_player]->hand[0]->value >
-          $state->players[$params['choosen_player']]->hand[0]->value
-        ) {
-          $state = self::playerHasLost($state, $params['choosen_player']);
-        } elseif (
-          $state->players[$state->current_player]->hand[0]->value <
-          $state->players[$params['choosen_player']]->hand[0]->value
-        ) {
-          $state = self::playerHasLost($state, $state->current_player);
-        }
-      } elseif ($params['played_card'] == 4) {
-        // Priestess
-        $state->players[$state->current_player]->immunity = true;
-      } elseif ($params['played_card'] == 5) {
-        // Sorcerer
-        array_push($state->current_round->played_cards, [
-          $params['choosen_player'],
-          $state->players[$params['choosen_player']]->hand[0]
-        ]);
-        array_pop($state->players[$params['choosen_player']]->hand);
-        $state = self::pickCard($state);
-      } elseif ($params['played_card'] == 6) {
-        // General
-        $card = $state->players[$state->current_player]->hand[0];
-        $state->players[$state->current_player]->hand[0] = $state->players[
-          $params['choosen_player']
-        ]->
-          hand[0];
-        $state->players[$params['choosen_player']]->hand[0] = $card;
-      } elseif ($params['played_card'] == 8) {
-        // Princess/Prince
-        $state = self::playerHasLost($state, $state->current_player);
-      }
-
-      /*
-		  if(count($state->current_round->pile) == 0)
-		  {
-			  // end of the round
-		  }
-
-		  if(count($state->current_round->current_players) == 1))
-		  {
-			// end of the round
-		  }
-	  */
-
-      // just a test
-      $state->test[] = $params;
-      $state = self::nextPlayer($state);
-    }
-    return $state;
-  }
-
   // it's the IA turn to play
   public static function playIA($state, $params)
   {
@@ -297,7 +201,7 @@ class Play
         );
         array_shift($state->current_round->pile);
       }
-    } elseif (cartenb == 6) {
+    } elseif ($cartenb == 6) {
       //Choisissez un joueur et échangez votre main avec la sienne.
       $playernbr = rand(0, count($state->players));
       while (
@@ -311,10 +215,10 @@ class Play
       $handp = $state->players[$playernbr]->hand;
       $state->players[$state->current_player]->hand = $handp;
       $state->players[$playernbr]->hand = $handc;
-    } elseif (cartenb == 7) {
+    } elseif ($cartenb == 7) {
       //Si vous gardez cette carte en main, calculez le total des valeurs de votre main à chaque pioche.
       //Si celui-ci est égal ou supérieur à douze, vous êtes éliminé.
-    } elseif (cartenb == 8) {
+    } elseif ($cartenb == 8) {
       //perdu
       $state = self::playerHasLost($state, $state->current_player);
     }

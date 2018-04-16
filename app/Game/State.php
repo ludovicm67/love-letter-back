@@ -2,6 +2,7 @@
 namespace App\Game;
 
 use App\Deck;
+use Illuminate\Support\Facades\Redis;
 use Ramsey\Uuid\Uuid;
 
 class State
@@ -98,5 +99,23 @@ class State
   {
     $currentPlayer = self::getCurrentPlayerInfos($state);
     return (!empty($currentPlayer) && $currentPlayer->id == auth()->user()->id);
+  }
+
+  public static function getGameInfos($key)
+  {
+    return json_decode(Redis::get($key));
+  }
+
+  public static function getWaitingGames()
+  {
+    return array_map('self::getGameInfos', Redis::keys('game:waiting:*'));
+  }
+
+  public static function save($key, $value)
+  {
+    if (is_array($value) || is_object($value)) {
+      $value = json_encode($value);
+    }
+    Redis::set($key, $value);
   }
 }
