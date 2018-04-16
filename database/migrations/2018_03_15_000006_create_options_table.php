@@ -15,7 +15,8 @@ class CreateOptionsTable extends Migration
     Schema::create('options', function (Blueprint $table) {
       $table->integer('player_id')->unsigned();
       $table->string('interface_color', 4);
-      $table->foreign('player_id')
+      $table
+        ->foreign('player_id')
         ->references('id')
         ->on('players');
       $table->primary('player_id');

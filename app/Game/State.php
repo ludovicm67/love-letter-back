@@ -17,7 +17,8 @@ class State
       'creator' => ['id' => $user->id, 'name' => $user->name],
       'deck' => [
         'content' => Deck::find(1)->cards,
-        'name' => Deck::find(1)
+        'name' => Deck
+          ::find(1)
           ->select('deck_name')
           ->get()
       ],

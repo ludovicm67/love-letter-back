@@ -74,8 +74,7 @@ class Human
         $card = $state->players[$state->current_player]->hand[0];
         $state->players[$state->current_player]->hand[0] = $state->players[
           $params['choosen_player']
-        ]->
-          hand[0];
+        ]->hand[0];
         $state->players[$params['choosen_player']]->hand[0] = $card;
       } elseif ($params['played_card'] == 8) {
         // Princess/Prince
