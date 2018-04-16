@@ -1,8 +1,71 @@
 <?php
 namespace App\Game;
 
+use App\Deck;
+use Ramsey\Uuid\Uuid;
+
 class State
 {
+  // initial state of a new game
+  public static function newGame()
+  {
+    $gameId = Uuid::uuid4();
+    $user = auth()->user();
+    return (object) [
+      'id' => $gameId,
+      'creator' => ['id' => $user->id, 'name' => $user->name],
+      'deck' => [
+        'content' => Deck::find(1)->cards,
+        'name' => Deck::find(1)
+          ->select('deck_name')
+          ->get()
+      ],
+      'winning_rounds' => 0,
+      'is_finished' => false,
+      'players' => [],
+      'current_player' => 0,
+      'current_round' => [
+        'number' => 0,
+        'pile' => [],
+        'played_cards' => [],
+        'current_players' => [] // all players that are currently in game
+      ],
+      'test' => [] // @TODO: may remove this; was just for testing purposes
+    ];
+  }
+
+  // initial state for a player
+  public static function newPlayer()
+  {
+    $user = auth()->user();
+    return (object) [
+      'id' => $user->id,
+      'name' => $user->name,
+      'hand' => [],
+      'winning_rounds_count' => 0,
+      'immunity' => false,
+      'ia' => 0
+    ];
+  }
+
+  // initial state for a new AI
+  public static function newAI($level = 1)
+  {
+    $name = 'IA';
+    if ($level > 1) {
+      $name = 'IA++';
+    }
+
+    return (object) [
+      'id' => round(microtime(true) * 10000), // just to send a unique ID
+      'name' => $name,
+      'hand' => [],
+      'winning_rounds_count' => 0,
+      'immunity' => false,
+      'ia' => $level
+    ];
+  }
+
   // get an array containing all players id
   public static function getPlayersId($state)
   {

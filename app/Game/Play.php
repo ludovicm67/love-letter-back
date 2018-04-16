@@ -1,73 +1,8 @@
 <?php
 namespace App\Game;
 
-use App\Deck;
-use Ramsey\Uuid\Uuid;
-
 class Play
 {
-  // initial state of a new game
-  public static function generateNewGameState()
-  {
-    $gameId = Uuid::uuid4();
-    $user = auth()->user();
-    return [
-      'id' => $gameId,
-      'creator' => ['id' => $user->id, 'name' => $user->name],
-      'deck' => [
-        'content' => Deck::find(1)->cards,
-        'name' => Deck::find(1)
-          ->select('deck_name')
-          ->get()
-      ],
-      'slots' => [0, 0, 0],
-      // to handle all kind of players
-      'winning_rounds' => 0,
-      'is_finished' => false,
-      'players' => [],
-      'current_player' => 0,
-      'current_round' => [
-        'number' => 0,
-        'pile' => [],
-        'played_cards' => [],
-        'current_players' => [] // all players that are currently in game
-      ],
-      'test' => [] // just for testing purposes
-    ];
-  }
-
-  // initial state for a player
-  public static function generateNewPlayer()
-  {
-    $user = auth()->user();
-    return [
-      'id' => $user->id,
-      'name' => $user->name,
-      'hand' => [],
-      'winning_rounds_count' => 0,
-      'immunity' => false,
-      'ia' => 0
-    ];
-  }
-
-  // initial state for a new IA
-  public static function generateNewIA($level)
-  {
-    $name = 'IA';
-    if ($level > 1) {
-      $name = 'IA++';
-    }
-
-    return [
-      'id' => round(microtime(true) * 10000),
-      'name' => $name,
-      'hand' => [],
-      'winning_rounds_count' => 0,
-      'immunity' => false,
-      'ia' => $level
-    ];
-  }
-
   /* a human player is playing
    * $params can contain :
    * action
@@ -150,7 +85,7 @@ class Play
 		  {
 			  // end of the round
 		  }
-		  
+
 		  if(count($state->current_round->current_players) == 1))
 		  {
 			// end of the round
