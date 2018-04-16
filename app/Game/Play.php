@@ -144,7 +144,7 @@ class Play
         // Princess/Prince
         $state = self::playerHasLost($state, $state->current_player);
       }
-      
+
       /*
 		  if(count($state->current_round->pile) == 0)
 		  {
@@ -156,7 +156,7 @@ class Play
 			// end of the round
 		  }
 	  */
-		  
+
       // just a test
       $state->test[] = $params;
       $state = self::nextPlayer($state);
@@ -523,14 +523,17 @@ class Play
     }
     return $state;
   }
-  
+
   // reset parameters for a new round
   public static function newRound($state)
   {
-	  $state = setCurrentPlayers($state); // every player comes back in the game
-	  $state = setPile($state); // the pile is sort out
-	  $state = distributeCards($state); // every player gets a card to start playing
-	  $state->current_round->number++;
-	  return $state;
+    $state = setCurrentPlayers($state);
+    // every player comes back in the game
+    $state = setPile($state);
+    // the pile is sort out
+    $state = distributeCards($state);
+    // every player gets a card to start playing
+    $state->current_round->number++;
+    return $state;
   }
 }
