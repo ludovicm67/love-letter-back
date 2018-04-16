@@ -1,11 +1,7 @@
 <?php
 namespace App\Http\Controllers;
 
-use App\Events\DeleteGameEvent;
-use App\Events\NewGameEvent;
-use App\Events\StartGameEvent;
-use App\Events\UpdateGameEvent;
-use App\Events\UpdateGameInfosEvent;
+use App\Game\Event;
 use App\Game\Human;
 use App\Game\Play;
 use App\Game\State;
@@ -44,12 +40,7 @@ class GameController extends Controller
 
     State::save('game:waiting:' . $game->id, $game);
     Redis::expire('game:waiting:' . $game->id, 3600); // TTL at 1 hour
-
-    $event = new NewGameEvent([
-      'game_id' => $game->id,
-      'games' => State::getWaitingGames()
-    ]);
-    event($event);
+    Event::newGame($game->id);
 
     return response()->json([
       'success' => true,
@@ -101,23 +92,18 @@ class GameController extends Controller
 
     State::save($startedKey, $game);
 
-    $event = new UpdateGameInfosEvent(['games' => State::getWaitingGames()]);
-    event($event);
-
-    $event = new StartGameEvent($params['game_id'], [
-      'game' => ['game_id' => $params['game_id'], 'game_infos' => $game]
-    ]);
-    event($event);
+    Event::updateGameInfos();
+    Event::startGame($game);
 
     return response()->json([
       'success' => true,
-      'data' => ['game_id' => $params['game_id'], 'game_infos' => $game]
+      'data' => ['game_id' => $game->id, 'game_infos' => $game]
     ]);
   }
 
   public function list()
   {
-    $games = array_map('State::getGameInfos', Redis::keys('game:*'));
+    $games = array_map('App\Game\State::getGameInfos', Redis::keys('game:*'));
     return response()->json(['success' => true, 'data' => ['games' => $games]]);
   }
 
@@ -213,13 +199,8 @@ class GameController extends Controller
     // save the new state conataining the new player
     State::save($waitingKey, $game);
 
-    $event = new UpdateGameInfosEvent(['games' => State::getWaitingGames()]);
-    event($event);
-
-    $event = new UpdateGameEvent($game->id, [
-      'game' => ['game_id' => $game->id, 'game_infos' => $game]
-    ]);
-    event($event);
+    Event::updateGameInfos();
+    Event::updateGame($game);
 
     return response()->json(['success' => true, 'data' => ['game' => $game]]);
   }
@@ -245,8 +226,7 @@ class GameController extends Controller
       $game = State::getGameInfos($key);
       if (isset($game->creator->id) && $game->creator->id == $user->id) {
         Redis::del($key);
-        $event = new DeleteGameEvent(['games' => State::getWaitingGames()]);
-        event($event);
+        Event::deleteGame();
         return 200;
       } else {
         return 403;
@@ -290,8 +270,7 @@ class GameController extends Controller
     foreach ($games as $game) {
       Redis::del($game);
     }
-    $event = new DeleteGameEvent(['games' => State::getWaitingGames()]);
-    event($event);
+    Event::deleteGame();
     return response()->json(['success' => true]);
   }
 
@@ -346,10 +325,7 @@ class GameController extends Controller
 
     // the human player will now play
     $state = Human::play($state, $params);
-    $event = new UpdateGameEvent($params['game_id'], [
-      'game' => ['game_id' => $params['game_id'], 'game_infos' => $state]
-    ]);
-    event($event);
+    Event::updateGame($state);
 
     // play while next player is an IA
     while (
@@ -357,10 +333,7 @@ class GameController extends Controller
     ) {
       pickCard($state);
       $state = Play::playIA($state, $params);
-      $event = new UpdateGameEvent($params['game_id'], [
-        'game' => ['game_id' => $params['game_id'], 'game_infos' => $state]
-      ]);
-      event($event);
+      Event::updateGame($state);
       sleep(2);
     }
 
