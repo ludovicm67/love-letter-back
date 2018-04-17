@@ -27,17 +27,13 @@ class Event
 
   public static function startGame($state)
   {
-    $event = new StartGameEvent($state->id, [
-      'game' => ['game_id' => $state->id, 'game_infos' => $state]
-    ]);
+    $event = new StartGameEvent($state->id, ['game' => $state]);
     event($event);
   }
 
   public static function updateGame($state)
   {
-    $event = new UpdateGameEvent($state->id, [
-      'game' => ['game_id' => $state->id, 'game_infos' => $state]
-    ]);
+    $event = new UpdateGameEvent($state->id, ['game' => $state]);
     event($event);
   }
 
