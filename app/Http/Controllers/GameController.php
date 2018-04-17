@@ -43,10 +43,7 @@ class GameController extends Controller
     Redis::expire('game:waiting:' . $game->id, 3600); // TTL at 1 hour
     Event::newGame($game->id);
 
-    return response()->json([
-      'success' => true,
-      'data' => ['game_id' => $game->id, 'game_infos' => $game]
-    ]);
+    return response()->json(['success' => true, 'data' => ['game' => $game]]);
   }
 
   public function list()
