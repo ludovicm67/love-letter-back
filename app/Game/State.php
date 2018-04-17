@@ -46,6 +46,7 @@ class State
       'hand' => [],
       'winning_rounds_count' => 0,
       'immunity' => false,
+      'can_play' => 0,
       'ia' => 0
     ];
   }
