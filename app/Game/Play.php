@@ -31,8 +31,10 @@ class Play
       } else {
         array_pop($state->players[$state->current_player]->hand);
       }
-      array_push($state->current_round->played_cards,
-        [$state->current_player,$carte]);
+      array_push($state->current_round->played_cards, [
+        $state->current_player,
+        $carte
+      ]);
     } elseif ($ia->ia == 2) {
       $newcard = $state->players[$state->current_player]->hand[1];
       $oldcard = $state->players[$state->current_player]->hand[0];
@@ -92,8 +94,10 @@ class Play
         array_shift($state->players[$state->current_player]->hand);
       }
 
-      array_push($state->current_round->played_cards,
-        [$state->current_player,$carte]);
+      array_push($state->current_round->played_cards, [
+        $state->current_player,
+        $carte
+      ]);
     }
     $state = self::playActionsAI($state, $carte, $ia->ia);
     $state = self::next_player($state);

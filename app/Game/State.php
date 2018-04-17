@@ -120,4 +120,14 @@ class State
     }
     Redis::set($key, $value);
   }
+
+  public static function fillWithAI($state)
+  {
+    $nbPlayers = count($state->players);
+    while ($nbPlayers < 4 && $state->slots[$nbPlayers - 1] > 0) {
+      $state->players[] = self::newAI($state->slots[$nbPlayers - 1]);
+      $nbPlayers++;
+    }
+    return $state;
+  }
 }

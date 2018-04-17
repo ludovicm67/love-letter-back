@@ -24,8 +24,7 @@ class Human
         $state->players[$state->current_player]->can_play == 1;
       }
     } elseif ($params['action'] == 'play_card') {
-      if($state->players[$state->current_player]->can_play == 1)
-      {
+      if ($state->players[$state->current_player]->can_play == 1) {
         $state->players[$state->current_player]->can_play == 0;
         $key_card = array_search(
           $params['played_card'],

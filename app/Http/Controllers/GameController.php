@@ -21,10 +21,10 @@ class GameController extends Controller
     ];
     $validator = Validator::make($params, $rules);
     if ($validator->fails()) {
-      return response()->json([
-        'success' => false,
-        'error' => $validator->messages()
-      ], 400);
+      return response()->json(
+        ['success' => false, 'error' => $validator->messages()],
+        400
+      );
     }
 
     $game = State::newGame();
@@ -37,6 +37,7 @@ class GameController extends Controller
 
     // add me as a player
     $game->players[] = State::newPlayer();
+    $game = State::fillWithAI($game);
 
     State::save('game:waiting:' . $game->id, $game);
     Redis::expire('game:waiting:' . $game->id, 3600); // TTL at 1 hour
@@ -67,15 +68,15 @@ class GameController extends Controller
     $startedKey = 'game:started:' . $params['game_id'];
     if (!Redis::exists($waitingKey)) {
       if (Redis::exists($startedKey)) {
-        return response()->json([
-          'success' => false,
-          'message' => 'game already started'
-        ], 409);
+        return response()->json(
+          ['success' => false, 'message' => 'game already started'],
+          409
+        );
       } else {
-        return response()->json([
-          'success' => false,
-          'message' => 'game not found'
-        ], 404);
+        return response()->json(
+          ['success' => false, 'message' => 'game not found'],
+          404
+        );
       }
     }
 
@@ -131,15 +132,15 @@ class GameController extends Controller
     $startedKey = 'game:started:' . $params['game_id'];
     if (!Redis::exists($waitingKey)) {
       if (Redis::exists($startedKey)) {
-        return response()->json([
-          'success' => false,
-          'message' => 'game already started'
-        ], 403);
+        return response()->json(
+          ['success' => false, 'message' => 'game already started'],
+          403
+        );
       } else {
-        return response()->json([
-          'success' => false,
-          'message' => 'game not found'
-        ], 404);
+        return response()->json(
+          ['success' => false, 'message' => 'game not found'],
+          404
+        );
       }
     }
 
@@ -154,47 +155,39 @@ class GameController extends Controller
       }
     }
     if (isset($game->players) && $nbPlayers >= $maxPlayers) {
-      return response()->json([
-        'success' => false,
-        'error' => 'too many players'
-      ], 403);
+      return response()->json(
+        ['success' => false, 'error' => 'too many players'],
+        403
+      );
     }
 
     $me = State::newPlayer();
 
     // bad game initialization
     if (!isset($game->players)) {
-      return response()->json([
-        'success' => false,
-        'error' => 'game was badly initialized'
-      ], 400);
+      return response()->json(
+        ['success' => false, 'error' => 'game was badly initialized'],
+        400
+      );
     }
 
     if (in_array($me->id, State::getPlayersId($game))) {
-      return response()->json([
-        'success' => false,
-        'error' => 'you already joined the game'
-      ], 409);
+      return response()->json(
+        ['success' => false, 'error' => 'you already joined the game'],
+        409
+      );
     }
 
-    // add all IA before me
-    while ($nbPlayers < 4 && $game->slots[$nbPlayers - 1] > 0) {
-      $game->players[] = State::newAI($game->slots[$nbPlayers - 1]);
-      $nbPlayers++;
-    }
+    $game = State::fillWithAI($game);
 
     // add me
+    $nbPlayers = count($game->players);
     if ($nbPlayers < 4 && $game->slots[$nbPlayers - 1] == 0) {
       $game->players[] = $me;
       $game->slots[$nbPlayers - 2] = -2;
       $nbPlayers++;
     }
-
-    // add all IA after me
-    while ($nbPlayers < 4 && $game->slots[$nbPlayers - 1] > 0) {
-      $game->players[] = State::newAI($game->slots[$nbPlayers - 1]);
-      $nbPlayers++;
-    }
+    $game = State::fillWithAI($game);
 
     // save the new state conataining the new player
     State::save($waitingKey, $game);
@@ -255,10 +248,10 @@ class GameController extends Controller
       $this->deleteGameWithPermissions('game:started:' . $params['game_id']) ==
       403
     ) {
-      return response()->json([
-        'success' => false,
-        'error' => 'cannot delete game of someone else'
-      ], 403);
+      return response()->json(
+        ['success' => false, 'error' => 'cannot delete game of someone else'],
+        403
+      );
     }
 
     return response()->json(['success' => true]);
@@ -302,25 +295,25 @@ class GameController extends Controller
     $startedKey = 'game:started:' . $params['game_id'];
     if (!Redis::exists($startedKey)) {
       if (Redis::exists($waitingKey)) {
-        return response()->json([
-          'success' => false,
-          'message' => 'game not started'
-        ], 403);
+        return response()->json(
+          ['success' => false, 'message' => 'game not started'],
+          403
+        );
       } else {
-        return response()->json([
-          'success' => false,
-          'message' => 'game not found'
-        ], 404);
+        return response()->json(
+          ['success' => false, 'message' => 'game not found'],
+          404
+        );
       }
     }
 
     $state = State::getGameInfos($startedKey);
 
     if (!State::isCurrentPlayer($state)) {
-      return response()->json([
-        'success' => false,
-        'message' => 'not your turn to play; be patient!'
-      ], 403);
+      return response()->json(
+        ['success' => false, 'message' => 'not your turn to play; be patient!'],
+        403
+      );
     }
 
     // the human player will now play

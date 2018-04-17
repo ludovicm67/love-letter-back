@@ -63,10 +63,10 @@ class Handler extends ExceptionHandler
             // do nothing
           }
         }
-        return response()->json([
-          'success' => false,
-          'message' => $statusMsg
-        ], $statusCode);
+        return response()->json(
+          ['success' => false, 'message' => $statusMsg],
+          $statusCode
+        );
       }
     }
     return parent::render($request, $exception);
