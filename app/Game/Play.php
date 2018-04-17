@@ -232,7 +232,7 @@ class Play
     return $state;
   }
 
-  private static function nextPlayer($state)
+  public static function nextPlayer($state)
   {
     $currentPlayer = $state->current_player;
     $find = false;
@@ -248,7 +248,7 @@ class Play
     return $state;
   }
 
-  private static function playerIsInGame($state, $player)
+  public static function playerIsInGame($state, $player)
   {
     $res = false;
     foreach ($state->current_round->current_players as $cp) {
@@ -259,7 +259,7 @@ class Play
     return $res;
   }
 
-  private static function playerHasLost($state, $playerIndex)
+  public static function playerHasLost($state, $playerIndex)
   {
     unset(
       $state->current_round->current_players[
