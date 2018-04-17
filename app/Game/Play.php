@@ -285,12 +285,10 @@ class Play
   }
 
   // before every round, every player is in game
-  public static function setCurrentPlayers($gameInfos)
+  public static function setCurrentPlayers($state)
   {
-    for ($i = 0; $i < count($gameInfos->players); $i++) {
-      array_push($gameInfos->current_round->current_players, $i);
-    }
-    return $gameInfos;
+    $state->current_round->current_players = range(0, count($state->players));
+    return $state;
   }
 
   /* before each round, the pile is set up :

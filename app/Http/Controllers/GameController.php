@@ -49,59 +49,6 @@ class GameController extends Controller
     ]);
   }
 
-  public function start(Request $request)
-  {
-    $params = $request->only('game_id');
-    $rules = [
-      'game_id' => 'required|string|min:36|max:36|regex:/^[0-9a-z-]+$/'
-    ];
-
-    $validator = Validator::make($params, $rules);
-    if ($validator->fails()) {
-      return response()->json([
-        'success' => false,
-        'error' => $validator->messages()
-      ]);
-    }
-
-    $waitingKey = 'game:waiting:' . $params['game_id'];
-    $startedKey = 'game:started:' . $params['game_id'];
-    if (!Redis::exists($waitingKey)) {
-      if (Redis::exists($startedKey)) {
-        return response()->json(
-          ['success' => false, 'message' => 'game already started'],
-          409
-        );
-      } else {
-        return response()->json(
-          ['success' => false, 'message' => 'game not found'],
-          404
-        );
-      }
-    }
-
-    // start the game by renaming the key
-    Redis::rename($waitingKey, $startedKey);
-
-    $game = State::getGameInfos($startedKey);
-    $game = Play::setWinningRounds($game);
-    $game = Play::setCurrentPlayers($game);
-    $game = Play::setPile($game);
-    $game = Play::distributeCards($game);
-
-    unset($game->slots);
-
-    State::save($startedKey, $game);
-
-    Event::updateGameInfos();
-    Event::startGame($game);
-
-    return response()->json([
-      'success' => true,
-      'data' => ['game_id' => $game->id, 'game_infos' => $game]
-    ]);
-  }
-
   public function list()
   {
     $games = array_map('App\Game\State::getGameInfos', Redis::keys('game:*'));
@@ -186,11 +133,10 @@ class GameController extends Controller
       $game->players[] = $me;
       $game->slots[$nbPlayers - 2] = -2;
       $nbPlayers++;
+      // save the new state conataining the new player
+      State::save($waitingKey, $game);
     }
     $game = State::fillWithAI($game);
-
-    // save the new state conataining the new player
-    State::save($waitingKey, $game);
 
     Event::updateGameInfos();
     Event::updateGame($game);
