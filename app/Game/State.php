@@ -35,7 +35,9 @@ class State
           'played_cards' => [],
           'current_players' => [] // all players that are currently in game
         ],
-        'test' => [] // @TODO: may remove this; was just for testing purposes
+        'test' => [],
+        // @TODO: may remove this; was just for testing purposes
+        'started' => false
       ])
     );
   }
@@ -139,14 +141,13 @@ class State
       self::save('game:waiting:' . $state->id, $state);
     }
 
-    self::tryStartGame($state);
-    return $state;
+    return self::tryStartGame($state);
   }
 
   private static function startGame($state)
   {
     if (!is_object($state) || !isset($state->id)) {
-      return false;
+      return $state;
     }
 
     $waitingKey = 'game:waiting:' . $state->id;
@@ -154,6 +155,7 @@ class State
 
     // start the game by renaming the key
     Redis::rename($waitingKey, $startedKey);
+    $state->started = true;
     unset($state->slots);
 
     $state = Play::setWinningRounds($state);
@@ -166,13 +168,13 @@ class State
     Event::updateGameInfos();
     Event::startGame($state);
 
-    return true;
+    return $state;
   }
 
   private static function tryStartGame($state)
   {
     if (!is_object($state) || !isset($state->id) || !isset($state->slots)) {
-      return false;
+      return $state;
     }
     $canHumanJoin = false;
     foreach ($state->slots as $slot) {
@@ -181,9 +183,8 @@ class State
       }
     }
     if (!$canHumanJoin) {
-      self::startGame($state);
-      return true;
+      return self::startGame($state);
     }
-    return false;
+    return $state;
   }
 }
