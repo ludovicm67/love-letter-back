@@ -379,4 +379,18 @@ class Play
     $state->current_round->number++;
     return $state;
   }
+
+  // if the pile is empty, it's the player who has the bigger card value 
+  public static function whoHasWon($state)
+  {
+    $winner = 0;
+    for($i = 0; $i < count($state->current_round->current_players); $i++)
+    {
+      if($winner < $state->players[$state->current_round->current_players[$i]]->hand[0]->value)
+      {
+        $winner = $state->current_round->current_players[$i];
+      }
+    }
+    return $winner;
+  }
 }

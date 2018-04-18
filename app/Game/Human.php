@@ -24,7 +24,8 @@ class Human
         $state->players[$state->current_player]->can_play = 1;
       }
     } elseif ($params['action'] == 'play_card') {
-      if ($state->players[$state->current_player]->can_play == 1) {
+      if($state->players[$state->current_player]->can_play == 1)
+      {
         $state->players[$state->current_player]->can_play = 0;
         $key_card = array_search(
           $params['played_card'],
@@ -84,17 +85,32 @@ class Human
           $state = Play::playerHasLost($state, $state->current_player);
         }
 
-        /*
+        // pile's empty
         if(count($state->current_round->pile) == 0)
         {
-          // end of the round
+          $winner = Play::whoHasWon($state);
+          $state->players[$winner]->winning_rounds_count++;
+          // event here ?!
+          if($state->players[$winner]->winning_rounds_count == $state->winning_rounds) // game's finished
+          {
+            // event here ?!
+            $state->is_finished = true;
+          }
+          return $state;
         }
 
+        // there's only one player left in the game
         if(count($state->current_round->current_players) == 1))
         {
-        // end of the round
+          $state->players[$state->current_round->current_players[0]]->winning_rounds_count++;
+          // event here ?!
+          if($state->players[$state->current_round->current_players[0]]->winning_rounds_count == $state->winning_rounds) // game's finished
+          {
+            // event here ?!
+            $state->is_finished = true;
+          }
+          return $state;
         }
-      */
 
         // just a test
         $state->test[] = $params;
