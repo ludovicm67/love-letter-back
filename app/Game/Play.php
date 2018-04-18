@@ -266,7 +266,9 @@ class Play
         array_search($playerIndex, $state->current_round->current_players)
       ]
     );
-    $state->current_round->current_players = array_values($state->current_round->current_players);
+    $state->current_round->current_players = array_values(
+      $state->current_round->current_players
+    );
     $card = array_pop($state->players[$playerIndex]->hand);
     array_push($state->current_round->played_cards, [$playerIndex, $card]);
     return $state;
@@ -288,7 +290,10 @@ class Play
   // before every round, every player is in game
   public static function setCurrentPlayers($state)
   {
-    $state->current_round->current_players = range(0, count($state->players)-1);
+    $state->current_round->current_players = range(
+      0,
+      count($state->players) - 1
+    );
     return $state;
   }
 
@@ -304,11 +309,10 @@ class Play
         array_push($gameInfos->current_round->pile, $card_copy);
       }
     }
-    
+
     // sort out the pile
     shuffle($gameInfos->current_round->pile);
     // a few cards are taken away from the pile
-
     $i = 0;
     if (count($gameInfos->players) == 2) {
       do {
@@ -343,16 +347,10 @@ class Play
   // when it's his turn to play, a player picks a card from the pile
   public static function pickCard($state, $player, $effect)
   {
-    array_push(
-      $state->players[$player]->hand,
-      $state->current_round->pile[0]
-    );
+    array_push($state->players[$player]->hand, $state->current_round->pile[0]);
     array_shift($state->current_round->pile);
-    if($effect == false)
-    {
-      if (
-        $state->players[$player]->hand[0]->card_name == 'minister'
-      ) {
+    if ($effect == false) {
+      if ($state->players[$player]->hand[0]->card_name == 'minister') {
         if (
           (
             $state->players[$player]->hand[0]->value +
@@ -361,29 +359,34 @@ class Play
           12
         ) {
           array_push($state->current_round->played_cards, [
-            $state->$player,
+            $state->{$player},
             $state->players[$player]->hand[1]
           ]);
           array_pop($state->players[$player]->hand);
           $state = self::playerHasLost($state, $player);
 
           // there's only one player left in the game
-          if(count($state->current_round->current_players) == 1)
-          {
-            $state->players[$state->current_round->current_players[0]]->winning_rounds_count++;
+          if (count($state->current_round->current_players) == 1) {
+            $state->players[
+              $state->current_round->current_players[0]
+            ]->winning_rounds_count++;
             // event here ?!
-            if($state->players[$state->current_round->current_players[0]]->winning_rounds_count == $state->winning_rounds) // game's finished
-            {
+            if (
+              $state->players[
+                $state->current_round->current_players[0]
+              ]->winning_rounds_count ==
+              $state->winning_rounds
+            ) {
+              // game's finished
               // event here ?!
               $state->is_finished = true;
-            }
-            else // game's not finished, then we start another round
-            {
-              $state = Play::newRound($state);  
+            } else {
+              // game's not finished, then we start another round
+              $state = Play::newRound($state);
             }
             return $state;
           }
-          
+
           $state = self::nextPlayer($state);
         }
       }
@@ -396,25 +399,22 @@ class Play
   {
     $state = self::setCurrentPlayers($state);
     // every player comes back in the game
-
     $i = 0;
     $size = count($state->current_round->pile);
     do {
       array_shift($state->current_round->pile);
       $i++;
-    } while($i < $size);
+    } while ($i < $size);
 
     $i = 0;
     $size = count($state->current_round->played_cards);
     do {
       array_shift($state->current_round->played_cards);
       $i++;
-    } while($i < $size);
+    } while ($i < $size);
     $state = self::setPile($state);
     // the pile is sort out
-
-    foreach($state->players as $player)
-    {
+    foreach ($state->players as $player) {
       array_shift($player->hand);
     }
     $state = self::distributeCards($state);
@@ -424,14 +424,17 @@ class Play
     return $state;
   }
 
-  // if the pile is empty, it's the player who has the bigger card value 
+  // if the pile is empty, it's the player who has the bigger card value
   public static function whoHasWon($state)
   {
     $winner = 0;
-    for($i = 0; $i < count($state->current_round->current_players); $i++)
-    {
-      if($winner < $state->players[$state->current_round->current_players[$i]]->hand[0]->value)
-      {
+    for ($i = 0; $i < count($state->current_round->current_players); $i++) {
+      if (
+        $winner <
+        $state->players[
+          $state->current_round->current_players[$i]
+        ]->hand[0]->value
+      ) {
         $winner = $state->current_round->current_players[$i];
       }
     }

@@ -23,16 +23,16 @@ class AuthController extends Controller
     $credentials = $request->only('name', 'password');
 
     $rules = [
-      'name' => 'required|string|max:255',
+      'name' => 'required|string|max:255|unique:players,name',
       'password' => 'required|string|min:1'
     ];
 
     $validator = Validator::make($credentials, $rules);
     if ($validator->fails()) {
-      return response()->json([
-        'success' => false,
-        'error' => $validator->messages()
-      ]);
+      return response()->json(
+        ['success' => false, 'error' => $validator->messages()],
+        400
+      );
     }
 
     $name = $request->name;
@@ -62,11 +62,14 @@ class AuthController extends Controller
       );
     }
 
-    return response()->json([
-      'success' => true,
-      'message' => 'Thanks for signing up! You can now login.',
-      'data' => ['token' => $token, 'user' => auth()->user()]
-    ]);
+    return response()->json(
+      [
+        'success' => true,
+        'message' => 'Thanks for signing up! You can now login.',
+        'data' => ['token' => $token, 'user' => auth()->user()]
+      ],
+      201
+    );
   }
 
   /**
