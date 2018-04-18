@@ -96,6 +96,10 @@ class Human
             // event here ?!
             $state->is_finished = true;
           }
+          else // game's not finished, then we start another round
+          {
+            $state = Play::newRound($state);  
+          }
           return $state;
         }
 
@@ -108,6 +112,10 @@ class Human
           {
             // event here ?!
             $state->is_finished = true;
+          }
+          else // game's not finished, then we start another round
+          {
+            $state = Play::newRound($state);  
           }
           return $state;
         }
