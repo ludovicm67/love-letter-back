@@ -50,6 +50,7 @@ class State
       'id' => $user->id,
       'name' => $user->name,
       'hand' => [],
+      'turn' => 0,
       'winning_rounds_count' => 0,
       'immunity' => false,
       'can_play' => 0,
