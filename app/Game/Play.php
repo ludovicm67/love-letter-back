@@ -266,6 +266,7 @@ class Play
         array_search($playerIndex, $state->current_round->current_players)
       ]
     );
+    $state->current_round->current_players = array_values($state->current_round->current_players);
     $card = array_pop($state->players[$playerIndex]->hand);
     array_push($state->current_round->played_cards, [$playerIndex, $card]);
     return $state;
@@ -287,7 +288,7 @@ class Play
   // before every round, every player is in game
   public static function setCurrentPlayers($state)
   {
-    $state->current_round->current_players = range(0, count($state->players));
+    $state->current_round->current_players = range(0, count($state->players)-1);
     return $state;
   }
 
@@ -303,19 +304,21 @@ class Play
         array_push($gameInfos->current_round->pile, $card_copy);
       }
     }
-
+    
     // sort out the pile
     shuffle($gameInfos->current_round->pile);
-
     // a few cards are taken away from the pile
+
+    $i = 0;
     if (count($gameInfos->players) == 2) {
-      for ($i = 0; $i < 3; $i++) {
+      do {
         array_push(
           $gameInfos->current_round->played_cards,
-          $gameInfos->current_round->pile[$i]
+          $gameInfos->current_round->pile[0]
         );
         array_shift($gameInfos->current_round->pile);
-      }
+        $i++;
+      } while ($i < 3);
     } else {
       // for three or four players
       array_push(
@@ -370,13 +373,33 @@ class Play
   // reset parameters for a new round
   public static function newRound($state)
   {
-    $state = setCurrentPlayers($state);
+    $state = self::setCurrentPlayers($state);
     // every player comes back in the game
-    $state = setPile($state);
+
+    $i = 0;
+    $size = count($state->current_round->pile);
+    do {
+      array_shift($state->current_round->pile);
+      $i++;
+    } while($i < $size);
+
+    $i = 0;
+    $size = count($state->current_round->played_cards);
+    do {
+      array_shift($state->current_round->played_cards);
+      $i++;
+    } while($i < $size);
+    $state = self::setPile($state);
     // the pile is sort out
-    $state = distributeCards($state);
+
+    foreach($state->players as $player)
+    {
+      array_shift($player->hand);
+    }
+    $state = self::distributeCards($state);
     // every player gets a card to start playing
     $state->current_round->number++;
+    $state->current_player = 0;
     return $state;
   }
 

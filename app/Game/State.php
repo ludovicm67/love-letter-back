@@ -30,7 +30,7 @@ class State
         'players' => [],
         'current_player' => 0,
         'current_round' => [
-          'number' => 0,
+          'number' => 1,
           'pile' => [],
           'played_cards' => [],
           'current_players' => [] // all players that are currently in game
