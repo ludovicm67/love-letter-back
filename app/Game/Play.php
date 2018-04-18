@@ -349,13 +349,9 @@ class Play
   {
     array_push($state->players[$player]->hand, $state->current_round->pile[0]);
     array_shift($state->current_round->pile);
-    if($effect == false)
-    {
-      if($state->players[$player]->turn > 1)
-      {
-        if (
-          $state->players[$player]->hand[0]->card_name == 'minister'
-        ) {
+    if ($effect == false) {
+      if ($state->players[$player]->turn > 1) {
+        if ($state->players[$player]->hand[0]->card_name == 'minister') {
           if (
             (
               $state->players[$player]->hand[0]->value +
@@ -371,17 +367,22 @@ class Play
             $state = self::playerHasLost($state, $player);
 
             // test if there's only one player left in the game
-            if(count($state->current_round->current_players) == 1)
-            {
-              $state->players[$state->current_round->current_players[0]]->winning_rounds_count++;
+            if (count($state->current_round->current_players) == 1) {
+              $state->players[
+                $state->current_round->current_players[0]
+              ]->winning_rounds_count++;
               // event here ?!
-              if($state->players[$state->current_round->current_players[0]]->winning_rounds_count == $state->winning_rounds) // game's finished
-              {
+              if (
+                $state->players[
+                  $state->current_round->current_players[0]
+                ]->winning_rounds_count ==
+                $state->winning_rounds
+              ) {
+                // game's finished
                 // event here ?!
                 $state->is_finished = true;
-              }
-              else // game's not finished, then we start another round
-              {
+              } else {
+                // game's not finished, then we start another round
                 $state = Play::newRound($state);
               }
               return $state;
@@ -392,7 +393,7 @@ class Play
       }
     }
     return $state;
-}
+  }
 
   // reset parameters for a new round
   public static function newRound($state)
