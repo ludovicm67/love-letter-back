@@ -150,4 +150,36 @@ class AuthTest extends TestCase
 
     $response->assertStatus(401)->assertJson(['success' => false]);
   }
+
+  public function testLogoutWithoutToken()
+  {
+    $response = $this->json('GET', '/api/logout');
+    $response->assertStatus(401)->assertJson(['success' => false]);
+  }
+
+  public function testLogoutWithBadToken()
+  {
+    $response = $this->json('GET', '/api/logout', [
+      'token' => 'ichBinEinToken'
+    ]);
+    $response->assertStatus(401)->assertJson(['success' => false]);
+  }
+
+  public function testLogout()
+  {
+    $user = User::whereName('TESTJohn');
+    $user->delete();
+
+    // create user
+    $response = $this->json('POST', '/api/register', [
+      'name' => 'TESTJohn',
+      'password' => 'TESTDoe'
+    ]);
+    $res = json_decode($response->content());
+
+    $response = $this->json('GET', '/api/logout', [
+      'token' => $res->data->token
+    ]);
+    $response->assertStatus(200)->assertJson(['success' => true]);
+  }
 }
