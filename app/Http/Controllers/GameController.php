@@ -15,7 +15,7 @@ class GameController extends Controller
   {
     $params = $request->only('slot2', 'slot3', 'slot4');
     $rules = [
-      'slot2' => 'required|integer|min:-1|max:2',
+      'slot2' => 'required|integer|min:0|max:2',
       'slot3' => 'required|integer|min:-1|max:2',
       'slot4' => 'required|integer|min:-1|max:2'
     ];
@@ -32,8 +32,13 @@ class GameController extends Controller
     // init the slots array
     $game->slots = [];
     $game->slots[] = intval($params['slot2']);
-    $game->slots[] = intval($params['slot3']);
-    $game->slots[] = intval($params['slot4']);
+    if (intval($params['slot3']) == -1) {
+      $game->slots[] = intval($params['slot4']);
+      $game->slots[] = intval($params['slot3']);
+    } else {
+      $game->slots[] = intval($params['slot3']);
+      $game->slots[] = intval($params['slot4']);
+    }
 
     // add me as a player
     $game->players[] = State::newPlayer();
@@ -43,7 +48,10 @@ class GameController extends Controller
     Redis::expire('game:waiting:' . $game->id, 3600); // TTL at 1 hour
     Event::newGame($game->id);
 
-    return response()->json(['success' => true, 'data' => ['game' => $game]]);
+    return response()->json(
+      ['success' => true, 'data' => ['game' => $game]],
+      201
+    );
   }
 
   public function list()
@@ -92,13 +100,13 @@ class GameController extends Controller
     $nbPlayers = count($game->players);
 
     // in case we have too much players
-    $maxPlayers = 4;
+    $nbHumanSlotsAvailable = 0;
     foreach ($game->slots as $slot) {
-      if ($slot != 0) {
-        $maxPlayers--;
+      if ($slot == 0) {
+        $nbHumanSlotsAvailable++;
       }
     }
-    if (isset($game->players) && $nbPlayers >= $maxPlayers) {
+    if ($nbHumanSlotsAvailable === 0) {
       return response()->json(
         ['success' => false, 'error' => 'too many players'],
         403

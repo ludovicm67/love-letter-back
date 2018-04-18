@@ -47,10 +47,9 @@ class Human
             $params['choosen_card_name'] ==
             $state->players[$params['choosen_player']]->hand[0]->card_name
           ) {
-              if($state->players[$params['choosen_player']]->immunity == false)
-              {
-                $state = Play::playerHasLost($state, $params['choosen_player']);
-              }
+            if ($state->players[$params['choosen_player']]->immunity == false) {
+              $state = Play::playerHasLost($state, $params['choosen_player']);
+            }
           }
         } elseif ($params['played_card'] == 3) {
           // Knight
@@ -58,10 +57,9 @@ class Human
             $state->players[$state->current_player]->hand[0]->value >
             $state->players[$params['choosen_player']]->hand[0]->value
           ) {
-              if($state->players[$params['choosen_player']]->immunity == false)
-                {
-                $state = Play::playerHasLost($state, $params['choosen_player']);
-              }
+            if ($state->players[$params['choosen_player']]->immunity == false) {
+              $state = Play::playerHasLost($state, $params['choosen_player']);
+            }
           } elseif (
             $state->players[$state->current_player]->hand[0]->value <
             $state->players[$params['choosen_player']]->hand[0]->value
@@ -73,25 +71,23 @@ class Human
           $state->players[$state->current_player]->immunity = true;
         } elseif ($params['played_card'] == 5) {
           // Sorcerer
-            if($state->players[$params['choosen_player']]->immunity == false)
-            {
-              array_push($state->current_round->played_cards, [
-                $params['choosen_player'],
-                $state->players[$params['choosen_player']]->hand[0]
-              ]);
-              array_pop($state->players[$params['choosen_player']]->hand);
-              $state = Play::pickCard($state, $params['choosen_player'], true);
-            }
+          if ($state->players[$params['choosen_player']]->immunity == false) {
+            array_push($state->current_round->played_cards, [
+              $params['choosen_player'],
+              $state->players[$params['choosen_player']]->hand[0]
+            ]);
+            array_pop($state->players[$params['choosen_player']]->hand);
+            $state = Play::pickCard($state, $params['choosen_player'], true);
+          }
         } elseif ($params['played_card'] == 6) {
           // General
-            if($state->players[$params['choosen_player']]->immunity == false)
-            {
-              $card = $state->players[$state->current_player]->hand[0];
-              $state->players[$state->current_player]->hand[0] = $state->players[
-                $params['choosen_player']
-              ]->hand[0];
-              $state->players[$params['choosen_player']]->hand[0] = $card;
-            }
+          if ($state->players[$params['choosen_player']]->immunity == false) {
+            $card = $state->players[$state->current_player]->hand[0];
+            $state->players[$state->current_player]->hand[0] = $state->players[
+              $params['choosen_player']
+            ]->hand[0];
+            $state->players[$params['choosen_player']]->hand[0] = $card;
+          }
         } elseif ($params['played_card'] == 8) {
           // Princess/Prince
           $state = Play::playerHasLost($state, $state->current_player);
