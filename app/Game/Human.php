@@ -20,7 +20,7 @@ class Human
 
     if ($params['action'] == 'pick_card') {
       if (count($state->players[$state->current_player]->hand) == 1) {
-        $state = Play::pickCard($state,$state->current_player,false);
+        $state = Play::pickCard($state, $state->current_player, false);
         $state->players[$state->current_player]->can_play = 1;
       }
     } elseif ($params['action'] == 'play_card') {
@@ -72,7 +72,7 @@ class Human
             $state->players[$params['choosen_player']]->hand[0]
           ]);
           array_pop($state->players[$params['choosen_player']]->hand);
-          $state = Play::pickCard($state, $params['choosen_player'],true);
+          $state = Play::pickCard($state, $params['choosen_player'], true);
         } elseif ($params['played_card'] == 6) {
           // General
           $card = $state->players[$state->current_player]->hand[0];

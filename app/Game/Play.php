@@ -347,9 +347,9 @@ class Play
       $state->players[$player]->hand,
       $state->current_round->pile[0]
     );
+    array_shift($state->current_round->pile);
     if($effect == false)
     {
-      array_shift($state->current_round->pile);
       if (
         $state->players[$player]->hand[0]->card_name == 'minister'
       ) {
