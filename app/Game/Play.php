@@ -31,8 +31,10 @@ class Play
       } else {
         array_pop($state->players[$state->current_player]->hand);
       }
-      array_push($state->current_round->played_cards,
-        [$state->current_player,$carte]);
+      array_push($state->current_round->played_cards, [
+        $state->current_player,
+        $carte
+      ]);
     } elseif ($ia->ia == 2) {
       $newcard = $state->players[$state->current_player]->hand[1];
       $oldcard = $state->players[$state->current_player]->hand[0];
@@ -92,8 +94,10 @@ class Play
         array_shift($state->players[$state->current_player]->hand);
       }
 
-      array_push($state->current_round->played_cards,
-        [$state->current_player,$carte]);
+      array_push($state->current_round->played_cards, [
+        $state->current_player,
+        $carte
+      ]);
     }
     $state = self::playActionsAI($state, $carte, $ia->ia);
     $state = self::next_player($state);
@@ -228,7 +232,7 @@ class Play
     return $state;
   }
 
-  private static function nextPlayer($state)
+  public static function nextPlayer($state)
   {
     $currentPlayer = $state->current_player;
     $find = false;
@@ -244,7 +248,7 @@ class Play
     return $state;
   }
 
-  private static function playerIsInGame($state, $player)
+  public static function playerIsInGame($state, $player)
   {
     $res = false;
     foreach ($state->current_round->current_players as $cp) {
@@ -255,7 +259,7 @@ class Play
     return $res;
   }
 
-  private static function playerHasLost($state, $playerIndex)
+  public static function playerHasLost($state, $playerIndex)
   {
     unset(
       $state->current_round->current_players[
@@ -281,12 +285,10 @@ class Play
   }
 
   // before every round, every player is in game
-  public static function setCurrentPlayers($gameInfos)
+  public static function setCurrentPlayers($state)
   {
-    for ($i = 0; $i < count($gameInfos->players); $i++) {
-      array_push($gameInfos->current_round->current_players, $i);
-    }
-    return $gameInfos;
+    $state->current_round->current_players = range(0, count($state->players));
+    return $state;
   }
 
   /* before each round, the pile is set up :
