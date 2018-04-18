@@ -100,7 +100,7 @@ class Human
         }
 
         // there's only one player left in the game
-        if(count($state->current_round->current_players) == 1))
+        if(count($state->current_round->current_players) == 1)
         {
           $state->players[$state->current_round->current_players[0]]->winning_rounds_count++;
           // event here ?!
