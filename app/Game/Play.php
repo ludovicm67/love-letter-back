@@ -12,7 +12,7 @@ class Play
       $c2 = $state->players[$state->current_player]->hand[1]->value;
       if ($c1 + $c2 > 12) {
         //joueur a perdu
-        // @TODO : moyen de le marqué comme perdant de la manche
+        $state = self::playerHasLost($state, $playernbr);
         return $state;
       }
     }
