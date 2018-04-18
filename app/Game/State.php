@@ -146,10 +146,6 @@ class State
 
   private static function startGame($state)
   {
-    if (!is_object($state) || !isset($state->id)) {
-      return $state;
-    }
-
     $waitingKey = 'game:waiting:' . $state->id;
     $startedKey = 'game:started:' . $state->id;
 

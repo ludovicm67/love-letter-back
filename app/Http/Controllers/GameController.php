@@ -128,7 +128,7 @@ class GameController extends Controller
     $nbPlayers = count($game->players);
     if ($nbPlayers < 4 && $game->slots[$nbPlayers - 1] == 0) {
       $game->players[] = $me;
-      $game->slots[$nbPlayers - 2] = -2;
+      $game->slots[$nbPlayers - 1] = -2;
       $nbPlayers++;
       // save the new state conataining the new player
       State::save($waitingKey, $game);
