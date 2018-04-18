@@ -20,6 +20,7 @@ class Human
 
     if ($params['action'] == 'pick_card') {
       if (count($state->players[$state->current_player]->hand) == 1) {
+        $state->players[$state->current_player]->turn++;
         $state = Play::pickCard($state, $state->current_player, false);
         $state->players[$state->current_player]->can_play = 1;
       }
@@ -85,7 +86,7 @@ class Human
           $state = Play::playerHasLost($state, $state->current_player);
         }
 
-        // pile's empty
+        // test if the pile's empty
         if(count($state->current_round->pile) == 0)
         {
           $winner = Play::whoHasWon($state);
@@ -103,7 +104,7 @@ class Human
           return $state;
         }
 
-        // there's only one player left in the game
+        // test if there's only one player left in the game
         if(count($state->current_round->current_players) == 1)
         {
           $state->players[$state->current_round->current_players[0]]->winning_rounds_count++;
