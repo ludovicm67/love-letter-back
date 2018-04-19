@@ -6,6 +6,9 @@ use App\Events\NewGameEvent;
 use App\Events\StartGameEvent;
 use App\Events\UpdateGameEvent;
 use App\Events\UpdateGameInfosEvent;
+use App\Events\EndGameEvent;
+use App\Events\EndRoundEvent;
+use App\Events\EliminatedPlayerEvent;
 use App\Game\State;
 
 class Event
@@ -42,4 +45,20 @@ class Event
     $event = new UpdateGameInfosEvent(['games' => State::getWaitingGames()]);
     event($event);
   }
+
+  /*@ TODO
+  public static function endGame($state)
+  {
+    event($event);
+  } 
+
+  public static function endRound($state)
+  {
+    event($event);
+  }
+
+  public static function eliminatedPlayer($state)
+  {
+    event($event);
+  }*/
 }
