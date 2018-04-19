@@ -318,7 +318,7 @@ class Play
       do {
         array_push(
           $gameInfos->current_round->played_cards,
-          $gameInfos->current_round->pile[0]
+          [-1, $gameInfos->current_round->pile[0]]
         );
         array_shift($gameInfos->current_round->pile);
         $i++;
@@ -327,7 +327,7 @@ class Play
       // for three or four players
       array_push(
         $gameInfos->current_round->played_cards,
-        $gameInfos->current_round->pile[0]
+        [-2, $gameInfos->current_round->pile[0]]
       );
       array_shift($gameInfos->current_round->pile);
     }
@@ -417,6 +417,7 @@ class Play
     // the pile is sort out
     foreach ($state->players as $player) {
       array_shift($player->hand);
+      $player->turn = 0;
     }
     $state = self::distributeCards($state);
     // every player gets a card to start playing
