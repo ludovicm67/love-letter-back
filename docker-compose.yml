@@ -1,0 +1,28 @@
+version: "2"
+services:
+  web:
+    build: .
+    ports:
+      - "1337:80"
+    depends_on:
+      - "database"
+      - "redis"
+    networks:
+      - network1
+  database:
+    image: mariadb
+    restart: always
+    networks:
+      - network1
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: love_letter
+  redis:
+    image: redis
+    restart: always
+    networks:
+      - network1
+
+networks:
+  network1:
+    driver: bridge
