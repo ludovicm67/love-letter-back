@@ -46,7 +46,7 @@ class Event
     event($event);
   }
 
-  /*@ TODO
+  //@ TODO
   public static function endGame($state)
   {
     event($event);
@@ -60,5 +60,5 @@ class Event
   public static function eliminatedPlayer($state)
   {
     event($event);
-  }*/
+  }
 }

@@ -2,6 +2,7 @@
 namespace App\Game;
 
 use App\Game\Play;
+use App\Game\Event;
 
 class Human
 {
@@ -49,6 +50,7 @@ class Human
           ) {
             if ($state->players[$params['choosen_player']]->immunity == false) {
               $state = Play::playerHasLost($state, $params['choosen_player']);
+              Event::eliminatedPlayer($state); // EVENT
             }
           }
         } elseif ($params['played_card'] == 3) {
@@ -59,12 +61,14 @@ class Human
           ) {
             if ($state->players[$params['choosen_player']]->immunity == false) {
               $state = Play::playerHasLost($state, $params['choosen_player']);
+              Event::eliminatedPlayer($state); // EVENT
             }
           } elseif (
             $state->players[$state->current_player]->hand[0]->value <
             $state->players[$params['choosen_player']]->hand[0]->value
           ) {
             $state = Play::playerHasLost($state, $state->current_player);
+            Event::eliminatedPlayer($state); // EVENT
           }
         } elseif ($params['played_card'] == 4) {
           // Priestess
@@ -91,6 +95,7 @@ class Human
         } elseif ($params['played_card'] == 8) {
           // Princess/Prince
           $state = Play::playerHasLost($state, $state->current_player);
+          Event::eliminatedPlayer($state); // EVENT
         }
 
         // test if the pile's empty
@@ -105,8 +110,10 @@ class Human
             // game's finished
             // event here ?!
             $state->is_finished = true;
+            Event::endGame($state); // EVENT
           } else {
             // game's not finished, then we start another round
+            Event::endRound($state); // EVENT
             $state = Play::newRound($state);
           }
           return $state;
@@ -127,8 +134,10 @@ class Human
             // game's finished
             // event here ?!
             $state->is_finished = true;
+            Event::endGame($state); // EVENT
           } else {
             // game's not finished, then we start another round
+            Event::endRound($state); // EVENT
             $state = Play::newRound($state);
           }
           return $state;
