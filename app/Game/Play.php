@@ -13,7 +13,8 @@ class Play
       if ($c1 + $c2 > 12) {
         //joueur a perdu
         $state = self::playerHasLost($state, $playernbr);
-        Event::eliminatedPlayer($state); // EVENT
+        Event::eliminatedPlayer($state);
+        // EVENT
         return $state;
       }
     }
@@ -232,7 +233,7 @@ class Play
     } elseif ($cartenb == 8) {
       //perdu
       $state = self::playerHasLost($state, $state->current_player);
-      Event::eliminatedPlayer($state); // EVENT      
+      Event::eliminatedPlayer($state); // EVENT
     }
 
     return $state;
@@ -322,19 +323,19 @@ class Play
     $i = 0;
     if (count($gameInfos->players) == 2) {
       do {
-        array_push(
-          $gameInfos->current_round->played_cards,
-          [-1, $gameInfos->current_round->pile[0]]
-        );
+        array_push($gameInfos->current_round->played_cards, [
+          -1,
+          $gameInfos->current_round->pile[0]
+        ]);
         array_shift($gameInfos->current_round->pile);
         $i++;
       } while ($i < 3);
     } else {
       // for three or four players
-      array_push(
-        $gameInfos->current_round->played_cards,
-        [-2, $gameInfos->current_round->pile[0]]
-      );
+      array_push($gameInfos->current_round->played_cards, [
+        -2,
+        $gameInfos->current_round->pile[0]
+      ]);
       array_shift($gameInfos->current_round->pile);
     }
     return $gameInfos;
@@ -391,7 +392,8 @@ class Play
                 Event::endGame($state); // EVENT
               } else {
                 // game's not finished, then we start another round
-                Event::endRound($state); // EVENT
+                Event::endRound($state);
+                // EVENT
                 $state = Play::newRound($state);
               }
               return $state;

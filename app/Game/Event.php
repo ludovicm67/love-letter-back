@@ -51,7 +51,7 @@ class Event
   {
     $event = 'random';
     event($event);
-  } 
+  }
 
   public static function endRound($state)
   {

@@ -113,7 +113,8 @@ class Human
             Event::endGame($state); // EVENT
           } else {
             // game's not finished, then we start another round
-            Event::endRound($state); // EVENT
+            Event::endRound($state);
+            // EVENT
             $state = Play::newRound($state);
           }
           return $state;
@@ -137,7 +138,8 @@ class Human
             Event::endGame($state); // EVENT
           } else {
             // game's not finished, then we start another round
-            Event::endRound($state); // EVENT
+            Event::endRound($state);
+            // EVENT
             $state = Play::newRound($state);
           }
           return $state;
