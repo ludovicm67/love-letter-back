@@ -55,13 +55,13 @@ class Event
 
   public static function endRound($state, $infos)
   {
-    $event = new EndGameEvent($state->id, ['game' => $infos]);
+    $event = new EndRoundEvent($state->id, ['game' => $infos]);
     event($event);
   }
 
   public static function eliminatedPlayer($state, $infos)
   {
-    $event = new EndGameEvent($state->id, ['game' => $infos]);
+    $event = new EliminatedPlayerEvent($state->id, ['game' => $infos]);
     event($event);
   }
 }
