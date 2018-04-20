@@ -47,21 +47,21 @@ class Event
   }
 
   //@ TODO
-  public static function endGame($state)
+  public static function endGame($state, $infos)
   {
-    $event = 'random';
+    $event = new EndGameEvent($state->id, ['game' => $infos]);
     event($event);
   }
 
-  public static function endRound($state)
+  public static function endRound($state, $infos)
   {
-    $event = 'random';
+    $event = new EndGameEvent($state->id, ['game' => $infos]);
     event($event);
   }
 
-  public static function eliminatedPlayer($state)
+  public static function eliminatedPlayer($state, $infos)
   {
-    $event = 'random';
+    $event = new EndGameEvent($state->id, ['game' => $infos]);
     event($event);
   }
 }

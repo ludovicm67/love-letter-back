@@ -13,8 +13,7 @@ class Play
       if ($c1 + $c2 > 12) {
         //joueur a perdu
         $state = self::playerHasLost($state, $playernbr);
-        Event::eliminatedPlayer($state);
-        // EVENT
+        //Event::eliminatedPlayer($state); // EVENT
         return $state;
       }
     }
@@ -128,7 +127,7 @@ class Play
         ) {
           //joueur a perdu
           $state = self::playerHasLost($state, $playernbr);
-          Event::eliminatedPlayer($state); // EVENT
+          //Event::eliminatedPlayer($state); // EVENT
         }
       } elseif ($ia == 2) {
         $playernbr = rand(0, count($state->players));
@@ -145,7 +144,7 @@ class Play
         ) {
           //joueur a perdu
           $state = self::playerHasLost($state, $playernbr);
-          Event::eliminatedPlayer($state); // EVENT
+          //Event::eliminatedPlayer($state); // EVENT
         }
       }
     } elseif ($cartenb == 2) {
@@ -169,14 +168,14 @@ class Play
       ) {
         //joueur current a perdu
         $state = self::playerHasLost($state, $state->current_player);
-        Event::eliminatedPlayer($state); // EVENT
+        //Event::eliminatedPlayer($state); // EVENT
       } elseif (
         $state->players[$playernbr]->hand[0]->value <
         $state->players[$state->current_player]->hand[0]->value
       ) {
         //autre joeur a perdu
         $state = self::playerHasLost($state, $playernbr);
-        Event::eliminatedPlayer($state); // EVENT
+        //Event::eliminatedPlayer($state); // EVENT
       } else {
         //egalite
       }
@@ -233,7 +232,7 @@ class Play
     } elseif ($cartenb == 8) {
       //perdu
       $state = self::playerHasLost($state, $state->current_player);
-      Event::eliminatedPlayer($state); // EVENT
+      //Event::eliminatedPlayer($state); // EVENT      
     }
 
     return $state;
@@ -372,7 +371,8 @@ class Play
             ]);
             array_pop($state->players[$player]->hand);
             $state = self::playerHasLost($state, $player);
-            Event::eliminatedPlayer($state); // EVENT
+            $infos = array('eliminated_player' => $state->players[$state->current_player]->name, 'eliminator_player' => $state->players[$state->current_player]->name, 'card' => 'minister');
+            Event::eliminatedPlayer($state, $infos); // EVENT
 
             // test if there's only one player left in the game
             if (count($state->current_round->current_players) == 1) {
@@ -389,11 +389,12 @@ class Play
                 // game's finished
                 // event here ?!
                 $state->is_finished = true;
-                Event::endGame($state); // EVENT
+                $infos = array('winner_name' => $state->players[$state->current_round->current_players[0]]->name);
+            	Event::endGame($state, $infos); // EVENT
               } else {
                 // game's not finished, then we start another round
-                Event::endRound($state);
-                // EVENT
+                $infos = array('winner_name' => $state->players[$state->current_round->current_players[0]]->name, 'reason_end' => 2);
+                Event::endRound($state, $infos); // EVENT
                 $state = Play::newRound($state);
               }
               return $state;
