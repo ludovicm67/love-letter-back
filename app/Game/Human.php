@@ -50,7 +50,8 @@ class Human
           ) {
             if ($state->players[$params['choosen_player']]->immunity == false) {
               $state = Play::playerHasLost($state, $params['choosen_player']);
-              Event::eliminatedPlayer($state); // EVENT
+              $infos = array('eliminated_player' => $state->players[$params['choosen_player']]->name, 'eliminator_player' => $state->players[$state->current_player]->name, 'card' => 'soldier');
+              Event::eliminatedPlayer($state, $infos); // EVENT
             }
           }
         } elseif ($params['played_card'] == 3) {
@@ -61,14 +62,16 @@ class Human
           ) {
             if ($state->players[$params['choosen_player']]->immunity == false) {
               $state = Play::playerHasLost($state, $params['choosen_player']);
-              Event::eliminatedPlayer($state); // EVENT
+              $infos = array('eliminated_player' => $state->players[$params['choosen_player']]->name, 'eliminator_player' => $state->players[$state->current_player]->name, 'card' => 'knight');
+              Event::eliminatedPlayer($state, $infos); // EVENT
             }
           } elseif (
             $state->players[$state->current_player]->hand[0]->value <
             $state->players[$params['choosen_player']]->hand[0]->value
           ) {
             $state = Play::playerHasLost($state, $state->current_player);
-            Event::eliminatedPlayer($state); // EVENT
+            $infos = array('eliminated_player' => $state->players[$state->current_player]->name, 'eliminator_player' => $state->players[$state->current_player]->name, 'card' => 'knight');
+            Event::eliminatedPlayer($state, $infos); // EVENT
           }
         } elseif ($params['played_card'] == 4) {
           // Priestess
@@ -95,7 +98,8 @@ class Human
         } elseif ($params['played_card'] == 8) {
           // Princess/Prince
           $state = Play::playerHasLost($state, $state->current_player);
-          Event::eliminatedPlayer($state); // EVENT
+          $infos = array('eliminated_player' => $state->players[$state->current_player]->name, 'eliminator_player' => $state->players[$state->current_player]->name, 'card' => 'princess_prince');
+          Event::eliminatedPlayer($state, $infos); // EVENT
         }
 
         // test if the pile's empty
@@ -110,11 +114,12 @@ class Human
             // game's finished
             // event here ?!
             $state->is_finished = true;
-            Event::endGame($state); // EVENT
+            $infos = array('winner_name' => $state->players[$winner]->name);
+            Event::endGame($state, $infos); // EVENT
           } else {
             // game's not finished, then we start another round
-            Event::endRound($state);
-            // EVENT
+            $infos = array('winner_name' => $state->players[$winner]->name, 'reason_end' => 1);
+            Event::endRound($state, $infos); // EVENT
             $state = Play::newRound($state);
           }
           return $state;
@@ -135,11 +140,12 @@ class Human
             // game's finished
             // event here ?!
             $state->is_finished = true;
-            Event::endGame($state); // EVENT
+            $infos = array('winner_name' => $state->players[$state->current_round->current_players[0]]->name);
+            Event::endGame($state, $infos); // EVENT
           } else {
             // game's not finished, then we start another round
-            Event::endRound($state);
-            // EVENT
+            $infos = array('winner_name' => $state->players[$state->current_round->current_players[0]]->name, 'reason_end' => 2);
+            Event::endRound($state, $infos); // EVENT
             $state = Play::newRound($state);
           }
           return $state;
