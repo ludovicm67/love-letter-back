@@ -1,8 +1,11 @@
 <?php
 namespace Tests\Unit;
 
+use App\Game\Human;
 use App\Game\Play;
+use App\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Auth;
 use Tests\TestCase;
 
 class PickCardTest extends TestCase
@@ -11,6 +14,11 @@ class PickCardTest extends TestCase
 
   protected function setUp()
   {
+    $this->createApplication();
+
+    $user = User::find(3);
+    Auth::login($user);
+
     $this->state = $state = json_decode(
       json_encode([
         "id" => "3c988174-a41f-4a51-a155-ba20c89db59c",
@@ -314,5 +322,42 @@ class PickCardTest extends TestCase
     $state = Play::pickCard($this->state, 0, false);
     $nbCardsAfter = count($state->players[0]->hand);
     $this->assertGreaterThan($nbCardsBefore, $nbCardsAfter);
+  }
+
+  public function testPlayPickCard()
+  {
+    $nbCardsBefore = count($this->state->players[0]->hand);
+    $state = Human::play($this->state, ['action' => 'pick_card']);
+    $nbCardsAfter = count($state->players[0]->hand);
+    $this->assertGreaterThan($nbCardsBefore, $nbCardsAfter);
+  }
+
+  public function testPlayKnight()
+  {
+    $state = $this->state;
+
+    $nbRounds = $state->current_round->number;
+
+    // add the knight card in his hand
+    $state->players[0]->can_play = 1;
+    $state->players[0]->hand[] = [
+      "id" => 3,
+      "card_name" => "knight",
+      "choose_players" => 1,
+      "choose_players_or_me" => 0,
+      "choose_card_name" => 0,
+      "value" => 3,
+      "number_copies" => 2,
+      "pivot" => ["deck_id" => 1, "card_id" => 3]
+    ];
+
+    $state = Human::play($this->state, [
+      'action' => 'play_card',
+      'played_card' => 3,
+      'choosen_player' => 1
+    ]);
+
+    $nbRoundsAfter = $state->current_round->number;
+    $this->assertGreaterThan($nbRounds, $nbRoundsAfter);
   }
 }
