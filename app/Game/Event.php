@@ -49,16 +49,19 @@ class Event
   //@ TODO
   public static function endGame($state)
   {
+    $event = 'random';
     event($event);
   } 
 
   public static function endRound($state)
   {
+    $event = 'random';
     event($event);
   }
 
   public static function eliminatedPlayer($state)
   {
+    $event = 'random';
     event($event);
   }
 }
