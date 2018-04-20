@@ -71,6 +71,7 @@ class State
       // just to send a unique ID
       'name' => $name,
       'hand' => [],
+      'turn' => 0,
       'winning_rounds_count' => 0,
       'immunity' => false,
       'ia' => $level

@@ -79,12 +79,21 @@ class Human
         } elseif ($params['played_card'] == 5) {
           // Sorcerer
           if ($state->players[$params['choosen_player']]->immunity == false) {
-            array_push($state->current_round->played_cards, [
-              $params['choosen_player'],
-              $state->players[$params['choosen_player']]->hand[0]
-            ]);
-            array_pop($state->players[$params['choosen_player']]->hand);
-            $state = Play::pickCard($state, $params['choosen_player'], true);
+            if($state->players[$params['choosen_player']]->hand[0]->value == 8)
+            {
+              $state = Play::playerHasLost($state, $params['choosen_player']);
+              $infos = array('eliminated_player' => $state->players[$params['choosen_player']]->name, 'eliminator_player' => $state->players[$state->current_player]->name, 'card' => 'sorcerer');
+              Event::eliminatedPlayer($state, $infos); // EVENT
+            }
+            else
+            {
+              array_push($state->current_round->played_cards, [
+                $params['choosen_player'],
+                $state->players[$params['choosen_player']]->hand[0]
+              ]);
+              array_pop($state->players[$params['choosen_player']]->hand);
+              $state = Play::pickCard($state, $params['choosen_player'], true);
+            }
           }
         } elseif ($params['played_card'] == 6) {
           // General

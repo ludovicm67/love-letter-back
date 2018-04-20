@@ -363,7 +363,7 @@ class Play
     array_shift($state->current_round->pile);
     if ($effect == false) {
       if ($state->players[$player]->turn > 1) {
-        if ($state->players[$player]->hand[0]->card_name == 'minister') {
+        if ($state->players[$player]->hand[0]->value == 7) {
           if (
             (
               $state->players[$player]->hand[0]->value +

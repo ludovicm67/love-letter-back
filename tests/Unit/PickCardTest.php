@@ -332,6 +332,66 @@ class PickCardTest extends TestCase
     $this->assertGreaterThan($nbCardsBefore, $nbCardsAfter);
   }
 
+  public function testPlaySoldierSuccess() // root choose the right card name
+  {
+    $state = $this->state;
+
+    $nbRounds = $state->current_round->number;
+
+    // add the soldier card in his hand
+    $state->players[0]->can_play = 1;
+    $state->players[0]->hand[] = [
+      "id" => 1,
+      "card_name" => "soldier",
+      "choose_players" => 1,
+      "choose_players_or_me" => 0,
+      "choose_card_name" => 1,
+      "value" => 1,
+      "number_copies" => 5,
+      "pivot" => ["deck_id" => 1, "card_id" => 1]
+    ];
+
+    $state = Human::play($this->state, [
+      'action' => 'play_card',
+      'played_card' => 1,
+      'choosen_player' => 1,
+      'choosen_card_name' => 'clown'
+    ]);
+
+    $nbRoundsAfter = $state->current_round->number;
+    $this->assertGreaterThan($nbRounds, $nbRoundsAfter);
+  }
+
+  public function testPlaySoldierFail() // root choose the wrong card name
+  {
+    $state = $this->state;
+
+    $nbRounds = $state->current_round->number;
+
+    // add the soldier card in his hand
+    $state->players[0]->can_play = 1;
+    $state->players[0]->hand[] = [
+      "id" => 1,
+      "card_name" => "soldier",
+      "choose_players" => 1,
+      "choose_players_or_me" => 0,
+      "choose_card_name" => 1,
+      "value" => 1,
+      "number_copies" => 5,
+      "pivot" => ["deck_id" => 1, "card_id" => 1]
+    ];
+
+    $state = Human::play($this->state, [
+      'action' => 'play_card',
+      'played_card' => 1,
+      'choosen_player' => 1,
+      'choosen_card_name' => 'minister'
+    ]);
+
+    $nbRoundsAfter = $state->current_round->number;
+    $this->assertEquals($nbRounds, $nbRoundsAfter);
+  }
+
   public function testPlayKnight()
   {
     $state = $this->state;
@@ -359,5 +419,94 @@ class PickCardTest extends TestCase
 
     $nbRoundsAfter = $state->current_round->number;
     $this->assertGreaterThan($nbRounds, $nbRoundsAfter);
+  }
+
+  public function testPlayPriestess() 
+  {
+    $state = $this->state;
+
+    $immunity = $state->players[0]->immunity;
+
+    // add the priestess card in his hand
+    $state->players[0]->can_play = 1;
+    $state->players[0]->hand[] = [
+   		"id" => 4,
+		"card_name" => "priestess",
+		"choose_players" => 0,
+		"choose_players_or_me" => 0,
+		"choose_card_name" => 0,
+		"value" => 4,
+		"number_copies" => 2,
+		"pivot" => ["deck_id" => 1, "card_id" => 4]
+    ];
+
+    $state = Human::play($this->state, [
+      'action' => 'play_card',
+      'played_card' => 4
+    ]);
+
+    $immunityAfter = $state->players[0]->immunity;
+    $this->assertNotEquals($immunity, $immunityAfter);
+  }
+
+  public function testPlaySorcerer() 
+  {
+    $state = $this->state;
+
+    $pile = count($state->current_round->pile);
+
+    // add the sorcerer card in his hand
+    $state->players[0]->can_play = 1;
+    $state->players[0]->hand[] = [
+   		"id" => 5,
+		"card_name" => "sorcerer",
+		"choose_players" => 1,
+		"choose_players_or_me" => 1,
+		"choose_card_name" => 0,
+		"value" => 5,
+		"number_copies" => 2,
+		"pivot" => ["deck_id" => 1, "card_id" => 5]
+    ];
+
+    $state = Human::play($this->state, [
+      'action' => 'play_card',
+      'played_card' => 5,
+      'choosen_player' => 1
+    ]);
+
+    $pileAfter = count($state->current_round->pile);
+    $this->assertGreaterThan($pile, $pileAfter);
+  }
+
+  public function testPlayGeneral()
+  {
+    $state = $this->state;
+
+    // add the soldier card in his hand
+    $state->players[0]->can_play = 1;
+    $state->players[0]->hand[] = [
+      "id" => 1,
+      "card_name" => "soldier",
+      "choose_players" => 1,
+      "choose_players_or_me" => 0,
+      "choose_card_name" => 1,
+      "value" => 1,
+      "number_copies" => 5,
+      "pivot" => ["deck_id" => 1, "card_id" => 1]
+    ];
+
+    $cardRoot = $state->players[0]->hand[1]->name;
+    $cardIa = $state->players[1]->hand[0]->name; 
+
+    $state = Human::play($this->state, [
+      'action' => 'play_card',
+      'played_card' => 3,
+      'choosen_player' => 1
+    ]);
+
+    $cardRootAfter = $state->players[0]->hand[0]->name;
+    $cardIaAfter = $state->players[1]->hand[0]->name;
+    $this->assertEquals($cardRoot, $cardIaAfter);
+    $this->assertEquals($cardIa, $cardRootAfter);
   }
 }
