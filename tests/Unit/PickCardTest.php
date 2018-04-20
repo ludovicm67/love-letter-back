@@ -332,8 +332,9 @@ class PickCardTest extends TestCase
     $this->assertGreaterThan($nbCardsBefore, $nbCardsAfter);
   }
 
-  public function testPlaySoldierSuccess() // root choose the right card name
+  public function testPlaySoldierSuccess()
   {
+    // root choose the right card name
     $state = $this->state;
 
     $nbRounds = $state->current_round->number;
@@ -362,8 +363,9 @@ class PickCardTest extends TestCase
     $this->assertGreaterThan($nbRounds, $nbRoundsAfter);
   }
 
-  public function testPlaySoldierFail() // root choose the wrong card name
+  public function testPlaySoldierFail()
   {
+    // root choose the wrong card name
     $state = $this->state;
 
     $nbRounds = $state->current_round->number;
@@ -430,14 +432,14 @@ class PickCardTest extends TestCase
     // add the priestess card in his hand
     $state->players[0]->can_play = 1;
     $state->players[0]->hand[] = (object) [
-   		"id" => 4,
-		"card_name" => "priestess",
-		"choose_players" => 0,
-		"choose_players_or_me" => 0,
-		"choose_card_name" => 0,
-		"value" => 4,
-		"number_copies" => 2,
-		"pivot" => ["deck_id" => 1, "card_id" => 4]
+      "id" => 4,
+      "card_name" => "priestess",
+      "choose_players" => 0,
+      "choose_players_or_me" => 0,
+      "choose_card_name" => 0,
+      "value" => 4,
+      "number_copies" => 2,
+      "pivot" => ["deck_id" => 1, "card_id" => 4]
     ];
 
     $state = Human::play($this->state, [
@@ -458,14 +460,14 @@ class PickCardTest extends TestCase
     // add the sorcerer card in his hand
     $state->players[0]->can_play = 1;
     $state->players[0]->hand[] = (object) [
-   		"id" => 5,
-		"card_name" => "sorcerer",
-		"choose_players" => 1,
-		"choose_players_or_me" => 1,
-		"choose_card_name" => 0,
-		"value" => 5,
-		"number_copies" => 2,
-		"pivot" => ["deck_id" => 1, "card_id" => 5]
+      "id" => 5,
+      "card_name" => "sorcerer",
+      "choose_players" => 1,
+      "choose_players_or_me" => 1,
+      "choose_card_name" => 0,
+      "value" => 5,
+      "number_copies" => 2,
+      "pivot" => ["deck_id" => 1, "card_id" => 5]
     ];
 
     $state = Human::play($this->state, [
