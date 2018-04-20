@@ -30,3 +30,4 @@ tags
 ehthumbs.db
 Thumbs.db
 /coverage
+/public/coverage
