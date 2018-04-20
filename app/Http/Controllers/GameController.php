@@ -97,7 +97,6 @@ class GameController extends Controller
     }
 
     $game = State::getGameInfos($waitingKey);
-    $nbPlayers = count($game->players);
 
     // in case we have too much players
     $nbHumanSlotsAvailable = 0;
@@ -114,15 +113,6 @@ class GameController extends Controller
     }
 
     $me = State::newPlayer();
-
-    // bad game initialization
-    if (!isset($game->players)) {
-      return response()->json(
-        ['success' => false, 'error' => 'game was badly initialized'],
-        400
-      );
-    }
-
     if (in_array($me->id, State::getPlayersId($game))) {
       return response()->json(
         ['success' => false, 'error' => 'you already joined the game'],
