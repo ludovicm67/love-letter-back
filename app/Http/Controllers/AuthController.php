@@ -146,31 +146,28 @@ class AuthController extends Controller
     }
   }
 
-  public function me(Request $request) {
+  public function me(Request $request)
+  {
     $this->validate($request, ['token' => 'required']);
     $token = $request->input('token');
 
+    // try {
+    //   $user = JWTAuth::authenticate($token);
+    // } catch (TokenExpiredException $e) {
     try {
+      $token = JWTAuth::refresh($token); // invalidate the old one, and create a new one
+      JWTAuth::setToken($token);
       $user = JWTAuth::authenticate($token);
     } catch (TokenExpiredException $e) {
-      try {
-        $token = JWTAuth::refresh($token);
-        JWTAuth::setToken($token);
-        $user = JWTAuth::authenticate($token);
-      } catch(TokenExpiredException $e) {
-        return response()->json([
-          'success' => false,
-          'message' => "need to login again"
-        ], 401);
-      }
+      return response()->json(
+        ['success' => false, 'message' => "need to login again"],
+        401
+      );
     }
-
+    // }
     return response()->json([
       'success' => true,
-      'data' => [
-        'token' => $token,
-        'user' => $user
-      ]
+      'data' => ['token' => $token, 'user' => $user]
     ]);
   }
 }

@@ -497,7 +497,7 @@ class PickCardTest extends TestCase
       "pivot" => ["deck_id" => 1, "card_id" => 1]
     ];
 
-    $cardRoot = $state->players[0]->hand[1]->value; 
+    $cardRoot = $state->players[0]->hand[1]->value;
     $cardIa = $state->players[1]->hand[0]->value;
 
     $state = Human::play($this->state, [
