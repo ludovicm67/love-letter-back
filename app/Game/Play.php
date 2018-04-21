@@ -23,6 +23,7 @@ class Play
         return $state;
       }
     }
+    $state->players[$state->current_player]->turn++;
 
     //put immunity to false, in case it was true
     $state->players[$state->current_player]->immunity = false;
