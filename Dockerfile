@@ -6,7 +6,7 @@ LABEL version="1.0"
 LABEL description="LoveLetter Backend"
 
 # installing dependencies
-RUN apt-get -y update
+RUN apt-get -y update && apt-get upgrade -y
 RUN apt-get install -y \
   apt-utils \
   git \
@@ -23,6 +23,11 @@ RUN apt-get install -y \
   php-xdebug \
   php-xml \
   mcrypt
+
+# installing NodeJS
+RUN curl -sL https://deb.nodesource.com/setup_9.x | bash -
+RUN apt-get install -y nodejs
+RUN npm install -g laravel-echo-server
 
 # configuring Apache
 RUN sed -i 's!/var/www/html!/var/www/html/public!g' \
@@ -61,4 +66,5 @@ COPY . /var/www/html/
 CMD sleep 25 \
   && cd /var/www/html/ \
   && php artisan migrate:fresh --seed \
+  && (laravel-echo-server start&) \
   && /usr/sbin/apache2ctl -DFOREGROUND

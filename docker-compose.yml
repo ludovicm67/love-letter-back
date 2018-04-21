@@ -4,6 +4,7 @@ services:
     build: .
     ports:
       - "1337:80"
+      - "1338:3001"
     depends_on:
       - "database"
       - "redis"
