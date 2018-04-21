@@ -12,7 +12,7 @@ class Play
       $c2 = $state->players[$state->current_player]->hand[1]->value;
       if ($c1 + $c2 > 12) {
         //joueur a perdu
-        $state = self::playerHasLost($state, $playernbr);
+        $state = self::playerHasLost($state, $state->current_player);
         $infos = array(
           'eliminated_player' => $state->players[$state->current_player]->name,
           'eliminator_player' => $state->players[$state->current_player]->name,
@@ -32,7 +32,7 @@ class Play
     if ($ia->ia == 1) {
       //ia aleatoire
       $nbr = rand(0, 1);
-      $carte = $ia->hand[nbr];
+      $carte = $ia->hand[$nbr];
       if ($nbr == 0) {
         array_shift($state->players[$state->current_player]->hand);
       } else {
