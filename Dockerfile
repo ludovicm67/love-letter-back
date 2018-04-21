@@ -62,9 +62,12 @@ RUN export COMPOSER_ALLOW_SUPERUSER=1 \
 
 COPY . /var/www/html/
 
+RUN sed -i 's/3001/1338/g' /var/www/html/laravel-echo-server.json
+
 # commands to run at startup
 CMD sleep 25 \
   && cd /var/www/html/ \
   && php artisan migrate:fresh --seed \
+  && vendor/bin/phpunit \
   && (laravel-echo-server start&) \
   && /usr/sbin/apache2ctl -DFOREGROUND
