@@ -166,6 +166,7 @@ class GameController extends Controller
         return 403;
       }
     }
+    return 404;
   }
 
   public function delete(Request $request)

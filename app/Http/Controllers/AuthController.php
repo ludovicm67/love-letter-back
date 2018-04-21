@@ -1,14 +1,14 @@
 <?php
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-
 use App\User;
-
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Password;
 use JWTAuth;
 use Tymon\JWTAuth\Exceptions\JWTException;
+use Tymon\JWTAuth\Exceptions\TokenExpiredException;
 use Validator;
-use Illuminate\Support\Facades\Password;
 
 class AuthController extends Controller
 {
@@ -144,5 +144,33 @@ class AuthController extends Controller
         500
       );
     }
+  }
+
+  public function me(Request $request) {
+    $this->validate($request, ['token' => 'required']);
+    $token = $request->input('token');
+
+    try {
+      $user = JWTAuth::authenticate($token);
+    } catch (TokenExpiredException $e) {
+      try {
+        $token = JWTAuth::refresh($token);
+        JWTAuth::setToken($token);
+        $user = JWTAuth::authenticate($token);
+      } catch(TokenExpiredException $e) {
+        return response()->json([
+          'success' => false,
+          'message' => "need to login again"
+        ], 401);
+      }
+    }
+
+    return response()->json([
+      'success' => true,
+      'data' => [
+        'token' => $token,
+        'user' => $user
+      ]
+    ]);
   }
 }

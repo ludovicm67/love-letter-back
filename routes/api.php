@@ -6,6 +6,7 @@ Route::post('login', 'AuthController@login');
 // all routes where we need to be signed in (token needed)
 Route::group(['middleware' => ['jwt.auth']], function () {
   Route::get('logout', 'AuthController@logout');
+  Route::get('me', 'AuthController@me');
 
   Route::post('game/create', 'GameController@create');
   Route::get('game/list', 'GameController@list');

@@ -162,6 +162,7 @@ Les différentes routes de l’API sont les suivantes :
     - `name`
     - `password`
   - `GET: /api/logout?token=TOKEN`
+  - `GET: /api/me?token=TOKEN`
   - `POST: /api/game/create?token=TOKEN`, avec :
     - `slot2`, un int entre 0 et 2
     - `slot3`, un int entre -1 et 2
