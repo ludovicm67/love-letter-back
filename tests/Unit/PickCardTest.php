@@ -497,18 +497,18 @@ class PickCardTest extends TestCase
       "pivot" => ["deck_id" => 1, "card_id" => 1]
     ];
 
-    $cardRoot = $state->players[0]->hand[1]->card_name;
-    $cardIa = $state->players[1]->hand[0]->card_name;
+    $cardRoot = $state->players[0]->hand[1]->value; 
+    $cardIa = $state->players[1]->hand[0]->value;
 
     $state = Human::play($this->state, [
       'action' => 'play_card',
-      'played_card' => 3,
+      'played_card' => 6,
       'choosen_player' => 1
     ]);
 
-    $cardRootAfter = $state->players[0]->hand[0]->card_name;
-    $cardIaAfter = $state->players[1]->hand[0]->card_name;
-    // $this->assertEquals($cardRoot, $cardIaAfter);
-    // $this->assertEquals($cardIa, $cardRootAfter);
+    $cardRootAfter = $state->players[0]->hand[0]->value;
+    $cardIaAfter = $state->players[1]->hand[0]->value;
+    $this->assertEquals($cardRoot, $cardIaAfter);
+    $this->assertEquals($cardRootAfter, $cardIa);
   }
 }

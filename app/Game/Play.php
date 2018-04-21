@@ -484,6 +484,7 @@ class Play
     foreach ($state->players as $player) {
       array_shift($player->hand);
       $player->turn = 0;
+      $player->immunity = false;
     }
     $state = self::distributeCards($state);
     // every player gets a card to start playing
@@ -495,14 +496,12 @@ class Play
   // if the pile is empty, it's the player who has the bigger card value
   public static function whoHasWon($state)
   {
-    $winner = 0;
-    for ($i = 0; $i < count($state->current_round->current_players); $i++) {
-      if (
-        $winner <
-        $state->players[
-          $state->current_round->current_players[$i]
-        ]->hand[0]->value
-      ) {
+    $winner; $card = 0;
+    for ($i = 0; $i < count($state->current_round->current_players); $i++) 
+    {
+      if ($card < $state->players[$state->current_round->current_players[$i]]->hand[0]->value) 
+      {
+        $card = $state->players[$state->current_round->current_players[$i]]->hand[0]->value;
         $winner = $state->current_round->current_players[$i];
       }
     }
