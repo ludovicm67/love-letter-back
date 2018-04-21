@@ -114,7 +114,7 @@ Pour lancer le projet, il vous faut impérativement :
 
 #### Installation
 
-Créez une base de donnée MySQl spécifique pour le projet.
+Créez une base de donnée MySQL spécifique pour le projet.
 
 Copiez le fichier `.env.example` en `.env`, et modifiez les informations de
 connexion à la base de données.
@@ -130,8 +130,8 @@ Générez ensuite une clé de sécurité pour les tokens JWT avec la commande :
 Enfin, lancez les migrations et les seeds (pour créer et peupler la base de
 données), avec la commande : `php artisan migrate:fresh --seed`.
 
-Vérifiez que tout est en ordre de fonctionnement, en lançant l'une de ces
-commandes (sont équivalentes, mais varient en fonction du système) :
+Vérifiez que tout est en ordre de marche, en lançant l'une de ces commandes,
+qui sont équivalentes, mais ne fonctionnent pas toutes en fonction du système :
  - `make tests`
  - `vendor/bin/phpunit`
  - `php vendor/bin/phpunit` (à condition d'avoir `php` dans son `PATH`)
@@ -151,7 +151,7 @@ Vous souhaitez récupérer une nouvelle version ?
 Utilisez la commande `git pull`, puis faites un `composer install` à nouveau,
 afin d'être certain d'avoir les bonnes dépendances.
 
-## Les différentes de l'API
+## Les différentes routes de l'API
 
 Les différentes routes de l’API sont les suivantes :
 
