@@ -151,6 +151,44 @@ Vous souhaitez récupérer une nouvelle version ?
 Utilisez la commande `git pull`, puis faites un `composer install` à nouveau,
 afin d'être certain d'avoir les bonnes dépendances.
 
+## Les différentes de l'API
+
+Les différentes routes de l’API sont les suivantes :
+
+  - `POST: /api/register`, avec
+    - `name`
+    - `password`
+  - `POST: /api/login`, avec
+    - `name`
+    - `password`
+  - `GET: /api/logout?token=TOKEN`
+  - `POST: /api/game/create?token=TOKEN`, avec :
+    - `slot2`, un int entre 0 et 2
+    - `slot3`, un int entre -1 et 2
+    - `slot4`, un int entre -1 et 2
+  - `GET: /api/game/list?token=TOKEN`
+  - `GET: /api/game/waitlist?token=TOKEN`
+  - `POST: /api/game/join?token=TOKEN`, avec
+    - `game_id`
+  - `POST: /api/game/play?token=TOKEN` , avec
+    - `game_id`
+    - `action` = `pick_card` ou `play_card`
+    - `played_card`
+    - `choosen_player`
+    - `choosen_card_name`
+  - `POST: /api/game/delete?token=TOKEN` , avec
+    - `game_id`
+  - `GET: /deleteallgames?token=TOKEN`
+
+Pour les valeurs des différents slots :
+  - Slot 1 = joueur1 = le créateur = forcément un joueur humain => pas besoin
+    d'être renseigné, car inutile.n
+  - Slot 2, 3 et 4 :
+    - -1 = emplacement fermé
+    - 0 = emplacement pour un joueur humain
+    - 1 = IA facile
+    - 2 = IA difficile
+
 ## Technologies utilisées
 
  - le framework PHP [Laravel](https://laravel.com/)
