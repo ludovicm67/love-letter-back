@@ -268,7 +268,8 @@ class GameController extends Controller
       $state->players[$state->current_player]->ia > 0
     ) {
       if (
-        in_array($state->current_player, $state->current_round->current_players)
+        in_array($state->current_player, $state->current_round->current_players) &&
+        isset($state->players[$state->current_player]->hand[0])
       ) {
         $state = Play::pickCard($state, $state->current_player, false);
         Event::updateGame($state);
