@@ -108,7 +108,7 @@ class Play
       ]);
     }
     $state = self::playActionsAI($state, $carte, $ia->ia);
-    $state = self::next_player($state);
+    $state = self::nextPlayer($state);
     return $state;
   }
 
@@ -397,9 +397,8 @@ class Play
           if (
             (
               $state->players[$player]->hand[0]->value +
-              $state->players[$player]->hand[1]->value
-            ) >=
-            12
+                $state->players[$player]->hand[1]->value
+            ) >= 12
           ) {
             array_push($state->current_round->played_cards, [
               $player,
@@ -427,8 +426,7 @@ class Play
               if (
                 $state->players[
                   $state->current_round->current_players[0]
-                ]->winning_rounds_count ==
-                $state->winning_rounds
+                ]->winning_rounds_count == $state->winning_rounds
               ) {
                 // game's finished
                 // event here ?!
@@ -496,12 +494,18 @@ class Play
   // if the pile is empty, it's the player who has the bigger card value
   public static function whoHasWon($state)
   {
-    $winner; $card = 0;
-    for ($i = 0; $i < count($state->current_round->current_players); $i++) 
-    {
-      if ($card < $state->players[$state->current_round->current_players[$i]]->hand[0]->value) 
-      {
-        $card = $state->players[$state->current_round->current_players[$i]]->hand[0]->value;
+    $winner = null;
+    $card = 0;
+    for ($i = 0; $i < count($state->current_round->current_players); $i++) {
+      if (
+        $card <
+        $state->players[
+          $state->current_round->current_players[$i]
+        ]->hand[0]->value
+      ) {
+        $card = $state->players[
+          $state->current_round->current_players[$i]
+        ]->hand[0]->value;
         $winner = $state->current_round->current_players[$i];
       }
     }

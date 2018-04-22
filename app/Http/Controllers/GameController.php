@@ -186,9 +186,9 @@ class GameController extends Controller
     // delete game by deleting redis keys that contains the game_id
     if (
       $this->deleteGameWithPermissions('game:waiting:' . $params['game_id']) ==
-      403 ||
+        403 ||
       $this->deleteGameWithPermissions('game:started:' . $params['game_id']) ==
-      403
+        403
     ) {
       return response()->json(
         ['success' => false, 'error' => 'cannot delete game of someone else'],
@@ -264,7 +264,8 @@ class GameController extends Controller
 
     // play while next player is an IA
     while (
-      !$state->is_finished && $state->players[$state->current_player]->ia > 0
+      !$state->is_finished &&
+      $state->players[$state->current_player]->ia > 0
     ) {
       pickCard($state, $state->current_player, false);
       $state = Play::playIA($state, $params);

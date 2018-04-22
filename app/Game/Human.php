@@ -186,8 +186,7 @@ class Human
           if (
             $state->players[
               $state->current_round->current_players[0]
-            ]->winning_rounds_count ==
-            $state->winning_rounds
+            ]->winning_rounds_count == $state->winning_rounds
           ) {
             // game's finished
             // event here ?!
