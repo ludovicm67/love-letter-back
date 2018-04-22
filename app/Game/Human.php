@@ -44,6 +44,11 @@ class Human
 
         if ($params['played_card'] == 1) {
           // Soldier
+
+          if (!isset($state->players[$params['choosen_player']]->hand[0])) {
+            return $state;
+          }
+
           if (
             $params['choosen_card_name'] ==
             $state->players[$params['choosen_player']]->hand[0]->card_name

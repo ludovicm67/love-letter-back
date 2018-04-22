@@ -494,7 +494,7 @@ class Play
   // if the pile is empty, it's the player who has the bigger card value
   public static function whoHasWon($state)
   {
-    $winner = null;
+    $winner = $state->current_round->current_players[0];
     $card = 0;
     for ($i = 0; $i < count($state->current_round->current_players); $i++) {
       if (
