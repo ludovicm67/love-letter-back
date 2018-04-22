@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/ludovicm67/projet-ihm-back.svg?token=4LgtqqAc8ZPrPBEdLaF6&branch=master)](https://travis-ci.com/ludovicm67/projet-ihm-back)
+[![Build Status](https://travis-ci.org/ludovicm67/projet-ihm-back.svg?branch=master)](https://travis-ci.org/ludovicm67/projet-ihm-back)
 
 # Projet IHM (partie backend)
 
@@ -193,7 +193,7 @@ Pour les valeurs des différents slots :
 ## Technologies utilisées
 
  - le framework PHP [Laravel](https://laravel.com/)
- - [Travis](https://travis-ci.com/) pour l'intégration continue
+ - [Travis](https://travis-ci.org/) pour l'intégration continue
  - GitHub pour héberger les sources, `git` pour le versionning
  - redis
  - MySQL
