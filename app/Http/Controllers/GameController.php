@@ -302,6 +302,7 @@ class GameController extends Controller
             $state = Play::newRound($state);
           }
           $stopIAPlaying = true;
+          break;
         }
 
         // test if there's only one player left in the game
@@ -337,6 +338,7 @@ class GameController extends Controller
             $state = Play::newRound($state);
           }
           $stopIAPlaying = true;
+          break;
         }
 
         $state = Play::pickCard($state, $state->current_player, false);
