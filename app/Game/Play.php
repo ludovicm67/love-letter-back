@@ -122,7 +122,7 @@ class Play
       if ($ia == 1) {
         $playernbr = rand(0, count($state->players) - 1);
         while (
-          !self::playerIsInGame($state, $state->players[$playernbr]) ||
+          !self::playerIsInGame($state, $playernbr) ||
           $playernbr == $state->current_player
         ) {
           $playernbr = rand(0, count($state->players) - 1);
@@ -146,7 +146,7 @@ class Play
       } elseif ($ia == 2) {
         $playernbr = rand(0, count($state->players) - 1);
         while (
-          !self::playerIsInGame($state, $state->players[$playernbr]) ||
+          !self::playerIsInGame($state, $playernbr) ||
           $playernbr == $state->current_player
         ) {
           $playernbr = rand(0, count($state->players) - 1);
@@ -176,7 +176,7 @@ class Play
       //Le joueur avec la carte avec la valeur la moins élevée est éliminé.
       $playernbr = rand(0, count($state->players) - 1);
       while (
-        !self::playerIsInGame($state, $state->players[$playernbr]) ||
+        !self::playerIsInGame($state, $playernbr) ||
         $playernbr == $state->current_player
       ) {
         $playernbr = rand(0, count($state->players) - 1);
@@ -218,7 +218,7 @@ class Play
       //Le joueur sélectionné défausse sa carte et en pioche une nouvelle
       if ($ia == 1) {
         $playernbr = rand(0, count($state->players) - 1);
-        while (!self::playerIsInGame($state, $state->players[$playernbr])) {
+        while (!self::playerIsInGame($state, $playernbr)) {
           $playernbr = rand(0, count($state->players) - 1);
         }
         array_shift($state->players[$playernbr]->hand);
@@ -232,7 +232,7 @@ class Play
           $playernbr = $state->current_player;
         } else {
           $playernbr = rand(0, count($state->players) - 1);
-          while (!self::playerIsInGame($state, $state->players[$playernbr])) {
+          while (!self::playerIsInGame($state, $playernbr)) {
             $playernbr = rand(0, count($state->players) - 1);
           }
         }
@@ -247,7 +247,7 @@ class Play
       //Choisissez un joueur et échangez votre main avec la sienne.
       $playernbr = rand(0, count($state->players) - 1);
       while (
-        !self::playerIsInGame($state, $state->players[$playernbr]) ||
+        !self::playerIsInGame($state, $playernbr) ||
         $playernbr == $state->current_player
       ) {
         $playernbr = rand(0, count($state->players) - 1);
