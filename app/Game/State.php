@@ -61,15 +61,15 @@ class State
   // initial state for a new AI
   public static function newAI($level = 1)
   {
+    $id = round(microtime(true) * 10000);
     $name = 'IA';
     if ($level > 1) {
       $name = 'IA++';
     }
-
     return (object) [
-      'id' => round(microtime(true) * 10000),
+      'id' => $id,
       // just to send a unique ID
-      'name' => $name,
+      'name' => $name . '#' . ($id % 10000),
       'hand' => [],
       'turn' => 0,
       'winning_rounds_count' => 0,
