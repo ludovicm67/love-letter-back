@@ -17,7 +17,6 @@ class Human
   {
     $state->players[$state->current_player]->immunity = false;
     // put immunity to false, in case it was true
-    $user = auth()->user(); // if need to do something with the user informations
 
     if ($params['action'] == 'pick_card') {
       if (count($state->players[$state->current_player]->hand) == 1) {

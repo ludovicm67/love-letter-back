@@ -107,7 +107,7 @@ class Play
         $carte
       ]);
     }
-    $state = self::playActionsAI($state, $carte, $ia->ia);
+    if (isset($carte) $state = self::playActionsAI($state, $carte, $ia->ia);
     $state = self::nextPlayer($state);
     return $state;
   }
@@ -389,6 +389,100 @@ class Play
   // when it's his turn to play, a player picks a card from the pile
   public static function pickCard($state, $player, $effect)
   {
+    /**
+     * START CHECK
+     */
+
+    // test if the pile's empty
+    if (count($state->current_round->pile) == 0) {
+      $winner = Play::whoHasWon($state);
+      $state->players[$winner]->winning_rounds_count++;
+      // event here ?!
+      if (
+        $state->players[$winner]->winning_rounds_count ==
+        $state->winning_rounds
+      ) {
+        // game's finished
+        // event here ?!
+        $state->is_finished = true;
+        $infos = array('winner_name' => $state->players[$winner]->name);
+        Event::endGame($state, $infos); // EVENT
+      } else {
+        // game's not finished, then we start another round
+        $infos = array(
+          'winner_name' => $state->players[$winner]->name,
+          'reason_end' => 1
+        );
+        Event::endRound($state, $infos);
+        // EVENT
+        $state = Play::newRound($state);
+      }
+      return $state;
+    }
+
+    // test if there's only one player left in the game
+    if (count($state->current_round->current_players) == 1) {
+      $state->players[
+        $state->current_round->current_players[0]
+      ]->winning_rounds_count++;
+      // event here ?!
+      if (
+        $state->players[
+          $state->current_round->current_players[0]
+        ]->winning_rounds_count == $state->winning_rounds
+      ) {
+        // game's finished
+        // event here ?!
+        $state->is_finished = true;
+        $infos = array(
+          'winner_name' => $state->players[
+            $state->current_round->current_players[0]
+          ]->name
+        );
+        Event::endGame($state, $infos); // EVENT
+      } else {
+        // game's not finished, then we start another round
+        $infos = array(
+          'winner_name' => $state->players[
+            $state->current_round->current_players[0]
+          ]->name,
+          'reason_end' => 2
+        );
+        Event::endRound($state, $infos);
+        // EVENT
+        $state = Play::newRound($state);
+      }
+      return $state;
+    }
+
+    /**
+     * END CHECK
+     */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     array_push($state->players[$player]->hand, $state->current_round->pile[0]);
     array_shift($state->current_round->pile);
     if ($effect == false) {
