@@ -190,8 +190,9 @@ class Play
       if ($state->players[$playernbr]->immunity) {
         //rien ne se passe joueur a immunité
       } elseif (
+        isset($state->players[$playernbr]->hand[0]) &&
         $state->players[$playernbr]->hand[0]->value >
-        $state->players[$state->current_player]->hand[0]->value
+          $state->players[$state->current_player]->hand[0]->value
       ) {
         //joueur current a perdu
         $state = self::playerHasLost($state, $state->current_player);
@@ -202,8 +203,9 @@ class Play
         );
         Event::eliminatedPlayer($state, $infos); // EVENT
       } elseif (
+        isset($state->players[$playernbr]->hand[0]) &&
         $state->players[$playernbr]->hand[0]->value <
-        $state->players[$state->current_player]->hand[0]->value
+          $state->players[$state->current_player]->hand[0]->value
       ) {
         //autre joeur a perdu
         $state = self::playerHasLost($state, $playernbr);
