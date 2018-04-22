@@ -224,15 +224,17 @@ class Play
       //Le joueur sélectionné défausse sa carte et en pioche une nouvelle
       if ($ia == 1) {
         $playernbr = rand(0, count($state->players) - 1);
-        while (!self::playerIsInGame($state, $playernbr)) {
-          $playernbr = rand(0, count($state->players) - 1);
+        if (isset($state->current_round->pile[0])) {
+          while (!self::playerIsInGame($state, $playernbr)) {
+            $playernbr = rand(0, count($state->players) - 1);
+          }
+          array_shift($state->players[$playernbr]->hand);
+          array_push(
+            $state->players[$playernbr]->hand,
+            $state->current_round->pile[0]
+          );
+          array_shift($state->current_round->pile);
         }
-        array_shift($state->players[$playernbr]->hand);
-        array_push(
-          $state->players[$playernbr]->hand,
-          $state->current_round->pile[0]
-        );
-        array_shift($state->current_round->pile);
       } elseif ($ia == 2) {
         if ($state->players[$state->current_player]->hand[0]->value < 5) {
           $playernbr = $state->current_player;
