@@ -302,6 +302,8 @@ class GameController extends Controller
             $state = Play::newRound($state);
           }
           $stopIAPlaying = true;
+          usleep(750000);
+          Event::updateGame($state);
           break;
         }
 
@@ -338,6 +340,8 @@ class GameController extends Controller
             $state = Play::newRound($state);
           }
           $stopIAPlaying = true;
+          usleep(750000);
+          Event::updateGame($state);
           break;
         }
 
