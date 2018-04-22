@@ -529,10 +529,13 @@ class Play
     $card = 0;
     for ($i = 0; $i < count($state->current_round->current_players); $i++) {
       if (
+        isset(
+          $state->players[$state->current_round->current_players[$i]]->hand[0]
+        ) &&
         $card <
-        $state->players[
-          $state->current_round->current_players[$i]
-        ]->hand[0]->value
+          $state->players[
+            $state->current_round->current_players[$i]
+          ]->hand[0]->value
       ) {
         $card = $state->players[
           $state->current_round->current_players[$i]
