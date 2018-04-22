@@ -262,21 +262,89 @@ class GameController extends Controller
     $state = Human::play($state, $params);
     Event::updateGame($state);
 
+    $stopIAPlaying = false;
+
     // play while next player is an IA
     while (
+      !$stopIAPlaying &&
       !$state->is_finished &&
       $state->players[$state->current_player]->ia > 0
     ) {
       if (
-        in_array($state->current_player, $state->current_round->current_players) &&
+        in_array(
+          $state->current_player,
+          $state->current_round->current_players
+        ) &&
         isset($state->players[$state->current_player]->hand[0])
       ) {
+        // test if the pile's empty
+        if (count($state->current_round->pile) == 0) {
+          $winner = Play::whoHasWon($state);
+          $state->players[$winner]->winning_rounds_count++;
+          // event here ?!
+          if (
+            $state->players[$winner]->winning_rounds_count ==
+            $state->winning_rounds
+          ) {
+            // game's finished
+            // event here ?!
+            $state->is_finished = true;
+            $infos = array('winner_name' => $state->players[$winner]->name);
+            Event::endGame($state, $infos); // EVENT
+          } else {
+            // game's not finished, then we start another round
+            $infos = array(
+              'winner_name' => $state->players[$winner]->name,
+              'reason_end' => 1
+            );
+            Event::endRound($state, $infos);
+            // EVENT
+            $state = Play::newRound($state);
+          }
+          $stopIAPlaying = true;
+        }
+
+        // test if there's only one player left in the game
+        if (count($state->current_round->current_players) == 1) {
+          $state->players[
+            $state->current_round->current_players[0]
+          ]->winning_rounds_count++;
+          // event here ?!
+          if (
+            $state->players[
+              $state->current_round->current_players[0]
+            ]->winning_rounds_count == $state->winning_rounds
+          ) {
+            // game's finished
+            // event here ?!
+            $state->is_finished = true;
+            $infos = array(
+              'winner_name' => $state->players[
+                $state->current_round->current_players[0]
+              ]->name
+            );
+            Event::endGame($state, $infos); // EVENT
+          } else {
+            // game's not finished, then we start another round
+            $infos = array(
+              'winner_name' => $state->players[
+                $state->current_round->current_players[0]
+              ]->name,
+              'reason_end' => 2
+            );
+            Event::endRound($state, $infos);
+            // EVENT
+            $state = Play::newRound($state);
+          }
+          $stopIAPlaying = true;
+        }
+
         $state = Play::pickCard($state, $state->current_player, false);
         Event::updateGame($state);
-        sleep(1);
+        usleep(750000);
         $state = Play::playIA($state, $params);
         Event::updateGame($state);
-        sleep(2);
+        sleep(1);
       } else {
         $state = Play::nextPlayer($state);
       }
