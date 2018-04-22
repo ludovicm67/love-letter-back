@@ -33,7 +33,7 @@ class Play
     if ($ia->ia == 1) {
       //ia aleatoire
       $nbr = rand(0, 1);
-      $carte = $ia->hand[$nbr];
+      $carte = (isset($ia->hand[$nbr])) ? $ia->hand[$nbr] : $ia->hand[0];
       if ($nbr == 0) {
         array_shift($state->players[$state->current_player]->hand);
       } else {

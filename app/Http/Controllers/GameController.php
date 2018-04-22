@@ -267,10 +267,16 @@ class GameController extends Controller
       !$state->is_finished &&
       $state->players[$state->current_player]->ia > 0
     ) {
-      $state = Play::pickCard($state, $state->current_player, false);
-      $state = Play::playIA($state, $params);
-      Event::updateGame($state);
-      sleep(2);
+      if (in_array($state->current_player, $state->current_round->current_players)) {
+        $state = Play::pickCard($state, $state->current_player, false);
+        Event::updateGame($state);
+        sleep(1);
+        $state = Play::playIA($state, $params);
+        Event::updateGame($state);
+        sleep(2);
+      } else {
+        $state = Play::nextPlayer($state);
+      }
     }
 
     // save the state in redis again
