@@ -127,7 +127,8 @@ class Play
         $playernbr = rand(0, count($state->players) - 1);
         while (
           !self::playerIsInGame($state, $playernbr) ||
-          $playernbr == $state->current_player
+          $playernbr == $state->current_player ||
+          !isset($state->players[$playernbr]->hand[0])
         ) {
           $playernbr = rand(0, count($state->players) - 1);
         }
@@ -152,7 +153,7 @@ class Play
         while (
           !self::playerIsInGame($state, $playernbr) ||
           $playernbr == $state->current_player ||
-          isset($state->players[$playernbr]->hand[0])
+          !isset($state->players[$playernbr]->hand[0])
         ) {
           $playernbr = rand(0, count($state->players) - 1);
         }
