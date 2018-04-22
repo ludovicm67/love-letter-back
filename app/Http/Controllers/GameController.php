@@ -267,7 +267,7 @@ class GameController extends Controller
       !$state->is_finished &&
       $state->players[$state->current_player]->ia > 0
     ) {
-      pickCard($state, $state->current_player, false);
+      $state = Play::pickCard($state, $state->current_player, false);
       $state = Play::playIA($state, $params);
       Event::updateGame($state);
       sleep(2);
