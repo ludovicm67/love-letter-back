@@ -67,8 +67,9 @@ class Human
         } elseif ($params['played_card'] == 3) {
           // Knight
           if (
+            isset($state->players[$params['choosen_player']]->hand[0]) &&
             $state->players[$state->current_player]->hand[0]->value >
-            $state->players[$params['choosen_player']]->hand[0]->value
+              $state->players[$params['choosen_player']]->hand[0]->value
           ) {
             if ($state->players[$params['choosen_player']]->immunity == false) {
               $state = Play::playerHasLost($state, $params['choosen_player']);
@@ -84,8 +85,9 @@ class Human
               Event::eliminatedPlayer($state, $infos); // EVENT
             }
           } elseif (
+            isset($state->players[$params['choosen_player']]->hand[0]) &&
             $state->players[$state->current_player]->hand[0]->value <
-            $state->players[$params['choosen_player']]->hand[0]->value
+              $state->players[$params['choosen_player']]->hand[0]->value
           ) {
             $state = Play::playerHasLost($state, $state->current_player);
             $infos = array(

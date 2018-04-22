@@ -171,7 +171,7 @@ class Play
             ]->name,
             'card' => 'soldier'
           );
-          Event::eliminatedPlayer($state); // EVENT
+          Event::eliminatedPlayer($state, $infos); // EVENT
         }
       }
     } elseif ($cartenb == 2) {
