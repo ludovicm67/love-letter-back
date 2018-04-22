@@ -107,7 +107,9 @@ class Play
         $carte
       ]);
     }
-    if (isset($carte) $state = self::playActionsAI($state, $carte, $ia->ia);
+    if (isset($carte)) {
+      $state = self::playActionsAI($state, $carte, $ia->ia);
+    }
     $state = self::nextPlayer($state);
     return $state;
   }
