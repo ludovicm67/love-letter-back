@@ -394,6 +394,29 @@ class Play
   // when it's his turn to play, a player picks a card from the pile
   public static function pickCard($state, $player, $effect)
   {
+    // test if the pile's empty
+    if (count($state->current_round->pile) == 0) {
+      $winner = Play::whoHasWon($state);
+      $state->players[$winner]->winning_rounds_count++;
+      if (
+        $state->players[$winner]->winning_rounds_count == $state->winning_rounds
+      ) {
+        $state->is_finished = true;
+        $infos = array('winner_name' => $state->players[$winner]->name);
+        Event::endGame($state, $infos); // EVENT
+      } else {
+        // game's not finished, then we start another round
+        $infos = array(
+          'winner_name' => $state->players[$winner]->name,
+          'reason_end' => 1
+        );
+        Event::endRound($state, $infos);
+        // EVENT
+        $state = Play::newRound($state);
+      }
+      Event::updateGame($state);
+      return $state;
+    }
     array_push($state->players[$player]->hand, $state->current_round->pile[0]);
     array_shift($state->current_round->pile);
     if ($effect == false) {
