@@ -61,6 +61,7 @@ class State
   // initial state for a new AI
   public static function newAI($level = 1)
   {
+    usleep(10000 + rand(0, 9999));
     $id = round(microtime(true) * 10000);
     $name = 'IA';
     if ($level > 1) {
