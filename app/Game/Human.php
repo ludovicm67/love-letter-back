@@ -17,7 +17,6 @@ class Human
   {
     $state->players[$state->current_player]->immunity = false;
     // put immunity to false, in case it was true
-
     if ($params['action'] == 'pick_card') {
       if (count($state->players[$state->current_player]->hand) == 1) {
         $state->players[$state->current_player]->turn++;
@@ -43,7 +42,6 @@ class Human
 
         if ($params['played_card'] == 1) {
           // Soldier
-
           if (!isset($state->players[$params['choosen_player']]->hand[0])) {
             return $state;
           }

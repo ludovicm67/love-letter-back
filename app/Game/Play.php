@@ -44,7 +44,9 @@ class Play
         $carte
       ]);
     } elseif ($ia->ia == 2) {
-      $newcard = $state->players[$state->current_player]->hand[1];
+      $newcard = (isset($state->players[$state->current_player]->hand[1]))
+        ? $state->players[$state->current_player]->hand[1]
+        : $state->players[$state->current_player]->hand[0];
       $oldcard = $state->players[$state->current_player]->hand[0];
 
       if ($newcard->value == 1) {
@@ -401,8 +403,7 @@ class Play
       $state->players[$winner]->winning_rounds_count++;
       // event here ?!
       if (
-        $state->players[$winner]->winning_rounds_count ==
-        $state->winning_rounds
+        $state->players[$winner]->winning_rounds_count == $state->winning_rounds
       ) {
         // game's finished
         // event here ?!
@@ -460,30 +461,6 @@ class Play
     /**
      * END CHECK
      */
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     array_push($state->players[$player]->hand, $state->current_round->pile[0]);
     array_shift($state->current_round->pile);
