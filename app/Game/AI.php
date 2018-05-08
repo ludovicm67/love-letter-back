@@ -63,56 +63,27 @@ class AI
     if ($cartenb == 1) {
       // Choisissez un joueur et un nom de carte (excepté “Soldat”).
       // Si le joueur possède cette carte, il est éliminé.
-      if ($ia == 1) {
+      $playernbr = rand(0, count($state->players) - 1);
+      while (
+        !Play::playerIsInGame($state, $playernbr) ||
+        $playernbr == $state->current_player ||
+        !isset($state->players[$playernbr]->hand[0])
+      ) {
         $playernbr = rand(0, count($state->players) - 1);
-        while (
-          !Play::playerIsInGame($state, $playernbr) ||
-          $playernbr == $state->current_player ||
-          !isset($state->players[$playernbr]->hand[0])
-        ) {
-          $playernbr = rand(0, count($state->players) - 1);
-        }
-        $cartev = rand(2, 8);
-        if (
-          $state->players[$playernbr]->hand[0]->value == $cartev &&
-          !$state->players[$playernbr]->immunity
-        ) {
-          // joueur a perdu
-          $state = Play::playerHasLost($state, $playernbr);
-          $infos = array(
-            'eliminated_player' => $state->players[$playernbr]->name,
-            'eliminator_player' => $state->players[
-              $state->current_player
-            ]->name,
-            'card' => 'soldier'
-          );
-          Event::eliminatedPlayer($state, $infos);
-        }
-      } elseif ($ia == 2) {
-        $playernbr = rand(0, count($state->players) - 1);
-        while (
-          !Play::playerIsInGame($state, $playernbr) ||
-          $playernbr == $state->current_player ||
-          !isset($state->players[$playernbr]->hand[0])
-        ) {
-          $playernbr = rand(0, count($state->players) - 1);
-        }
-        $cartev = rand(2, 5);
-        if (
-          $state->players[$playernbr]->hand[0]->value == $cartev &&
-          !$state->players[$playernbr]->immunity
-        ) {
-          // joueur a perdu
-          $state = Play::playerHasLost($state, $playernbr);
-          $infos = array(
-            'eliminated_player' => $state->players[$playernbr]->name,
-            'eliminator_player' => $state->players[
-              $state->current_player
-            ]->name,
-            'card' => 'soldier'
-          );
-          Event::eliminatedPlayer($state, $infos);
-        }
+      }
+      $cartev = ($ia == 2) ? rand(2, 5) : rand(2, 8);
+      if (
+        $state->players[$playernbr]->hand[0]->value == $cartev &&
+        !$state->players[$playernbr]->immunity
+      ) {
+        // joueur a perdu
+        $state = Play::playerHasLost($state, $playernbr);
+        $infos = array(
+          'eliminated_player' => $state->players[$playernbr]->name,
+          'eliminator_player' => $state->players[$state->current_player]->name,
+          'card' => 'soldier'
+        );
+        Event::eliminatedPlayer($state, $infos);
       }
     } elseif ($cartenb == 2) {
       // Consultez la main d’un joueur.
@@ -170,12 +141,6 @@ class AI
           while (!Play::playerIsInGame($state, $playernbr)) {
             $playernbr = rand(0, count($state->players) - 1);
           }
-          array_shift($state->players[$playernbr]->hand);
-          array_push(
-            $state->players[$playernbr]->hand,
-            $state->current_round->pile[0]
-          );
-          array_shift($state->current_round->pile);
         }
       } elseif ($ia == 2) {
         if ($state->players[$state->current_player]->hand[0]->value < 5) {
@@ -186,6 +151,10 @@ class AI
             $playernbr = rand(0, count($state->players) - 1);
           }
         }
+      }
+
+      // run only of there are cards in the pile
+      if (isset($state->current_round->pile[0])) {
         array_shift($state->players[$playernbr]->hand);
         array_push(
           $state->players[$playernbr]->hand,
