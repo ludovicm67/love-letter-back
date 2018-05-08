@@ -3,6 +3,7 @@ namespace App\Http\Controllers;
 
 use App\Game\Event;
 use App\Game\Human;
+use App\Game\AI;
 use App\Game\Play;
 use App\Game\State;
 use Illuminate\Http\Request;
@@ -348,7 +349,7 @@ class GameController extends Controller
         $state = Play::pickCard($state, $state->current_player, false);
         Event::updateGame($state);
         usleep(750000);
-        $state = Play::playIA($state, $params);
+        $state = AI::play($state);
         Event::updateGame($state);
         sleep(1);
       } else {
