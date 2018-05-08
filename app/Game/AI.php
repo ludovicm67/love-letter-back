@@ -1,8 +1,6 @@
 <?php
 use App\Game\Event;
 use App\Game\Play;
-use App\Game\AI\Easy;
-use App\Game\AI\Hard;
 
 namespace App\Game;
 
@@ -36,10 +34,10 @@ class AI
     $results = [];
     switch ($ia->ia) {
       case 1:
-        $results = Easy::play($state, $ia);
+        $results = \App\Game\AI\Easy::play($state, $ia);
         break;
       case 2:
-        $results = Hard::play($state, $ia);
+        $results = \App\Game\AI\Hard::play($state, $ia);
         break;
       default:
         // do nothing
