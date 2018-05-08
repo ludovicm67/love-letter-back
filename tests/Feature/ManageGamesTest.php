@@ -60,12 +60,19 @@ class ManageGamesTest extends TestCase
       'slot3' => 0,
       'slot4' => 0
     ]);
+    $resCreate = json_decode($response->content());
     $response
       ->assertStatus(201)
       ->assertJson([
         'success' => true,
         'data' => ['game' => ['started' => false]]
       ]);
+
+    $response = $this->json('POST', '/api/game/delete', [
+      'token' => $res->data->token,
+      'game_id' => $resCreate->data->game->id
+    ]);
+    $response->assertStatus(200)->assertJson(['success' => true]);
   }
 
   public function testCreateGameThatWillDirectlyBeStarted()
@@ -158,12 +165,19 @@ class ManageGamesTest extends TestCase
       'slot3' => -1,
       'slot4' => 0
     ]);
+    $resCreate = json_decode($response->content());
     $response
       ->assertStatus(201)
       ->assertJson([
         'success' => true,
         'data' => ['game' => ['started' => false]]
       ]);
+
+    $response = $this->json('POST', '/api/game/delete', [
+      'token' => $res->data->token,
+      'game_id' => $resCreate->data->game->id
+    ]);
+    $response->assertStatus(200)->assertJson(['success' => true]);
   }
 
   public function testCreateGameThatWillBeStartedAfterPlayerJoined()
