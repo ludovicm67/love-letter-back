@@ -1,11 +1,10 @@
-FROM ubuntu:17.10
-
-MAINTAINER Ludovic Muller <ludovicmuller1@gmail.com>
+FROM ubuntu:18.04
 
 LABEL version="1.0"
 LABEL description="LoveLetter Backend"
 
 # installing dependencies
+RUN ln -fs /usr/share/zoneinfo/Europe/Paris /etc/localtime
 RUN apt-get -y update && apt-get upgrade -y
 RUN apt-get install -y \
   apt-utils \
@@ -18,11 +17,10 @@ RUN apt-get install -y \
   php-gd \
   php-json \
   php-mysql \
-  php-mcrypt \
   php-mbstring \
   php-xdebug \
   php-xml \
-  mcrypt
+  gnupg
 
 # installing NodeJS
 RUN curl -sL https://deb.nodesource.com/setup_9.x | bash -
@@ -36,6 +34,8 @@ RUN sed -i 's!/var/www/html!/var/www/html/public!g' \
 RUN sed -i 's!AllowOverride None!AllowOverride All!g' \
   /etc/apache2/apache2.conf \
   /etc/apache2/sites-available/000-default.conf
+RUN sed -i 's!display_errors = Off!display_errors = On!g' \
+  /etc/php/7.2/apache2/php.ini
 RUN a2enmod rewrite
 RUN a2enmod headers
 
@@ -64,6 +64,8 @@ RUN export COMPOSER_ALLOW_SUPERUSER=1 \
 COPY . /var/www/html/
 
 RUN sed -i 's/3001/1338/g' /var/www/html/laravel-echo-server.json
+
+RUN chown -R www-data:www-data /var/www/html
 
 # commands to run at startup
 CMD sleep 25 \
