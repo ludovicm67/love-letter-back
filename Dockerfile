@@ -58,7 +58,10 @@ RUN export COMPOSER_ALLOW_SUPERUSER=1 \
   && php artisan jwt:secret
 
 COPY . /var/www/html/
-RUN sed -i 's/3001/1338/g' /var/www/html/laravel-echo-server.json
+RUN sed -i 's/3001/1338/g' /var/www/html/laravel-echo-server.json \
+  && sed -i -E \
+    's/(\"host\": \")localhost(\")/\1redis\2/g' \
+    /var/www/html/laravel-echo-server.json
 RUN chown -R www-data:www-data /var/www/html
 
 # commands to run at startup
