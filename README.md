@@ -1,17 +1,17 @@
-[![Build Status](https://travis-ci.org/ludovicm67/projet-ihm-back.svg?branch=master)](https://travis-ci.org/ludovicm67/projet-ihm-back)
+[![Build Status](https://travis-ci.org/ludovicm67/love-letter-back.svg?branch=master)](https://travis-ci.org/ludovicm67/love-letter-back)
 
-# Projet IHM (partie backend)
+# Love Letter (partie backend)
 
 Pour accéder à la partie frontend de l'application :
-https://github.com/ludovicm67/projet-ihm-front
+https://github.com/ludovicm67/love-letter-front
 
 ## Récupération des sources
 
 Commencez tout d'abord par clôner le dépôt, et rendez-vous dans le dossier :
 
 ```sh
-git clone git@github.com:ludovicm67/projet-ihm-back.git
-cd projet-ihm-back
+git clone git@github.com:ludovicm67/love-letter-back.git
+cd love-letter-back
 ```
 
 ## Mise en route
